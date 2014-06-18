@@ -898,7 +898,8 @@
                 'click .auth-otr': 'authOTR',
                 'click .toggle-call': 'toggleCall',
                 'mousedown .dragresize-tm': 'onDragResizeStart',
-                'click .toggle-filetransfer': 'toggleFiletransferMenu'
+                'click .toggle-filetransfer': 'toggleFiletransferMenu',
+                'click .toggle-filetransfer .validation': 'initializeFiletransfer'
             },
 
             initialize: function (){
@@ -1277,6 +1278,27 @@
                     return;
 
                 this.$el.find('.toggle-filetransfer ul').slideToggle(400);
+            },
+
+            initializeFiletransfer: function (ev) {
+                var input, files, file;
+
+                ev.preventDefault();
+                ev.stopPropagation();
+
+                input = $('.toggle-filetransfer .file');
+                console.log('input', input);
+
+                files = (input.length > 0) && input[0].files;
+                console.log('files', files);
+
+                if (!files || files.length === 0) {
+                    console.log('please select a file');
+                    return;
+                }
+
+                file = files[0];
+                console.log('file', file);
             },
 
             onChange: function (item, changed) {
