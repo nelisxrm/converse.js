@@ -18,7 +18,12 @@
     </li>
 {[ } ]}
 {[ if (allow_filetransfer)  { ]}
-    <li class="toggle-filetransfer"><a class="icon-attachment" title="Send a file"></a></li>
+    <li class="toggle-filetransfer icon-attachment" title="Send a file">
+        <ul>
+            <li><input type="file" class="file"/></li>
+            <li><button class="validation">Send</button></li>
+        </ul>
+    </li>
 {[ } ]}
 {[ if (show_call_button)  { ]}
     <li class="toggle-call"><a class="icon-phone" title="Start a call"></a></li>

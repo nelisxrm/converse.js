@@ -897,7 +897,8 @@
                 'click .end-otr': 'endOTR',
                 'click .auth-otr': 'authOTR',
                 'click .toggle-call': 'toggleCall',
-                'mousedown .dragresize-tm': 'onDragResizeStart'
+                'mousedown .dragresize-tm': 'onDragResizeStart',
+                'click .toggle-filetransfer': 'toggleFiletransferMenu'
             },
 
             initialize: function (){
@@ -1267,6 +1268,15 @@
                     connection: converse.connection,
                     model: this.model
                 });
+            },
+
+            toggleFiletransferMenu: function (ev) {
+                ev.stopPropagation();
+
+                if (!ev.target.classList.contains('toggle-filetransfer'))
+                    return;
+
+                this.$el.find('.toggle-filetransfer ul').slideToggle(400);
             },
 
             onChange: function (item, changed) {
