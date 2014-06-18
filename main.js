@@ -1,5 +1,5 @@
 config = {
-    baseUrl: '.',
+    baseUrl: 'web/vendor/converse',
     paths: {
         "jquery": "components/jquery/dist/jquery",
         "jquery.tinysort": "components/tinysort/src/jquery.tinysort",
@@ -83,5 +83,9 @@ if (typeof(require) !== 'undefined') {
     require.config(config);
     require(["jquery", "converse"], function(require, $, converse) {
         window.converse = converse;
+    });
+
+    define('jquery', [], function() {
+        return jQuery;
     });
 }
