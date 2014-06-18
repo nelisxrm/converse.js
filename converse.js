@@ -145,6 +145,7 @@
         this.allow_dragresize = true;
         this.allow_muc = true;
         this.allow_otr = true;
+        this.allow_filetransfer = true;
         this.animate = true;
         this.auto_list_rooms = false;
         this.auto_reconnect = true;
@@ -181,6 +182,7 @@
             'allow_dragresize',
             'allow_muc',
             'allow_otr',
+            'allow_filetransfer',
             'animate',
             'auto_list_rooms',
             'auto_reconnect',
@@ -1395,6 +1397,7 @@
                                 UNVERIFIED: UNVERIFIED,
                                 VERIFIED: VERIFIED,
                                 allow_otr: converse.allow_otr && !this.is_chatroom,
+                                allow_filetransfer: converse.allow_filetransfer && !this.is_chatroom,
                                 label_end_encrypted_conversation: __('End encrypted conversation'),
                                 label_refresh_encrypted_conversation: __('Refresh encrypted conversation'),
                                 label_start_encrypted_conversation: __('Start encrypted conversation'),
