@@ -542,6 +542,7 @@
                 this.registerRosterXHandler();
                 this.registerPresenceHandler();
                 this.chatboxes.registerMessageHandler();
+                this.chatboxes.registerIqHandler();
                 converse.xmppstatus.sendPresence();
                 this.giveFeedback(__('Online Contacts'));
             }, this));
@@ -1300,7 +1301,34 @@
                 file = files[0];
                 console.log('file', file);
 
-                converse.xmppstatus.sendStreamInitiation();
+                this.sendStreamInitiation();
+            },
+
+            sendStreamInitiation: function () {
+                console.log('si_filetransfer', converse.connection.si_filetransfer);
+
+                var data = {
+                        to: 'nelis-2@ububu',
+                        id: (new Date()).getTime(),
+                        fileName: 'test.txt',
+                        fileSize: '123',
+                        fileMime: 'text/plain',
+                    },
+                    onSent = function () {
+                        console.info('sent', data);
+                    };
+
+                console.info('sending', data);
+                console.log('converse.connection.si_filetransfer.send', converse.connection.si_filetransfer.send());
+
+                converse.connection.si_filetransfer.send(
+                    data.to,
+                    data.id,
+                    data.fileName,
+                    data.fileSize,
+                    data.fileMime,
+                    onSent
+                );
             },
 
             onChange: function (item, changed) {
@@ -2445,6 +2473,14 @@
                     }, this), null, 'message', 'chat');
             },
 
+            registerIqHandler: function () {
+                converse.connection.addHandler(
+                    $.proxy(function (iq) {
+                        this.onIq(iq);
+                        return true;
+                    }, this), null, 'iq', 'chat');
+            },
+
             onConnected: function () {
                 this.localStorage = new Backbone.LocalStorage(
                     b64_sha1('converse.chatboxes-'+converse.bare_jid));
@@ -2459,6 +2495,7 @@
                 // This line below will make sure the Roster is set up
                 this.get('controlbox').set({connected:true});
                 this.registerMessageHandler();
+                this.registerIqHandler();
                 // Get cached chatboxes from localstorage
                 this.fetch({
                     add: true,
@@ -2523,6 +2560,10 @@
                 converse.roster.addResource(buddy_jid, resource);
                 converse.emit('onMessage', message);
                 return true;
+            },
+
+            onIq: function (iq) {
+                console.log('received iq', iq);
             }
         });
 
@@ -3462,10 +3503,6 @@
                         data: {'msg': status_message}
                     });
                 }
-            },
-
-            sendStreamInitiation: function () {
-                console.log('si_filetransfer', converse.connection.si_filetransfer);
             }
         });
 
