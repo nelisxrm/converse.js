@@ -17,6 +17,7 @@ config = {
         "strophe.roster": "components/strophe.roster/index",
         "strophe.vcard": "components/strophe.vcard/index",
         "strophe.disco": "components/strophe.disco/index",
+        "strophe.si-filetransfer": "components/strophejs-plugins/si-filetransfer/strophe.si-filetransfer",
         "salsa20": "components/otr/build/dep/salsa20",
         "bigint": "src/bigint",
         "crypto.core": "components/otr/vendor/cryptojs/core",
@@ -75,7 +76,8 @@ config = {
         'strophe.disco':        { deps: ['strophe'] },
         'strophe.muc':          { deps: ['strophe', 'jquery'] },
         'strophe.roster':       { deps: ['strophe'] },
-        'strophe.vcard':        { deps: ['strophe'] }
+        'strophe.vcard':        { deps: ['strophe'] },
+        'strophe.si-filetransfer':        { deps: ['strophe'] }
     }
 };
 

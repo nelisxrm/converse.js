@@ -10,7 +10,8 @@ define("converse-dependencies", [
     "strophe.muc",
     "strophe.roster",
     "strophe.vcard",
-    "strophe.disco"
+    "strophe.disco",
+    "strophe.si-filetransfer"
 ], function(otr, moment) {
     return {
         'otr': otr,

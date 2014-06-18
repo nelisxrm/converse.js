@@ -1277,7 +1277,7 @@
                 if (!ev.target.classList.contains('toggle-filetransfer'))
                     return;
 
-                this.$el.find('.toggle-filetransfer ul').slideToggle(400);
+                this.$el.find('.toggle-filetransfer ul').slideToggle(200);
             },
 
             initializeFiletransfer: function (ev) {
@@ -1299,6 +1299,8 @@
 
                 file = files[0];
                 console.log('file', file);
+
+                converse.xmppstatus.sendStreamInitiation();
             },
 
             onChange: function (item, changed) {
@@ -3460,6 +3462,10 @@
                         data: {'msg': status_message}
                     });
                 }
+            },
+
+            sendStreamInitiation: function () {
+                console.log('si_filetransfer', converse.connection.si_filetransfer);
             }
         });
 

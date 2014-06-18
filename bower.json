@@ -27,7 +27,8 @@
     "requirejs-tpl-jcbrand": "*",
     "momentjs": "~2.6.0",
     "jquery.browser": "~0.0.6",
-    "backbone.overview": "*"
+    "backbone.overview": "*",
+    "strophejs-plugins": "*"
   },
   "exportsOverride": {}
 }
