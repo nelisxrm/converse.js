@@ -1,0 +1,13 @@
+{
+  "name": "strophe.ibb",
+  "_cacheHeaders": {
+    "ETag": "\"5858cf7ba6da8a387263c60be9960d06\"",
+    "Content-Length": "61762",
+    "Content-Type": "text/html; charset=utf-8"
+  },
+  "_release": "e-tag:5858cf7ba",
+  "main": "index.js",
+  "_source": "https://github.com/g8g3/strophejs-plugins/blob/integration/ibb/strophe.ibb.js",
+  "_target": "*",
+  "_originalSource": "https://github.com/g8g3/strophejs-plugins/blob/integration/ibb/strophe.ibb.js"
+}

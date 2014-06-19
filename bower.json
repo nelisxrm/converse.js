@@ -20,6 +20,8 @@
     "strophe.vcard": "https://raw.github.com/strophe/strophejs-plugins/f5c9e16b463610d501591452cded0359f53aae48/vcard/strophe.vcard.js",
     "strophe.disco": "https://raw.github.com/jcbrand/strophejs-plugins/75c8693992bc357c699b6d615eeb396e799f5c02/disco/strophe.disco.js",
     "strophe.muc": "https://raw.github.com/strophe/strophejs-plugins/02310ad1b8da2962cd05b0f4bceaecca134efed4/muc/strophe.muc.js",
+    "strophe.ibb": "https://raw.githubusercontent.com/g8g3/strophejs-plugins/integration/ibb/strophe.ibb.js",
+    "strophe.si-filetransfer": "https://raw.githubusercontent.com/g8g3/strophejs-plugins/integration/si-filetransfer/strophe.si-filetransfer.js",
     "otr": "0.2.12",
     "crypto-js-evanvosberg": "~3.1.2",
     "almond": "~0.2.9",
@@ -27,8 +29,7 @@
     "requirejs-tpl-jcbrand": "*",
     "momentjs": "~2.6.0",
     "jquery.browser": "~0.0.6",
-    "backbone.overview": "*",
-    "strophejs-plugins": "*"
+    "backbone.overview": "*"
   },
   "exportsOverride": {}
 }

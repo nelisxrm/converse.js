@@ -1314,12 +1314,15 @@
                         fileSize: '123',
                         fileMime: 'text/plain',
                     },
-                    onSent = function () {
+                    onSent = function (error) {
+                        if (error) {
+                            return console.error(error);
+                        }
+
                         console.info('sent', data);
                     };
 
                 console.info('sending', data);
-                console.log('converse.connection.si_filetransfer.send', converse.connection.si_filetransfer.send());
 
                 converse.connection.si_filetransfer.send(
                     data.to,
