@@ -1301,14 +1301,22 @@
                 file = files[0];
                 console.log('file', file);
 
-                this.sendStreamInitiation();
+                this.sendStreamInitiationToAllResources(file);
             },
 
-            sendStreamInitiation: function () {
-                console.log('si_filetransfer', converse.connection.si_filetransfer);
+            sendStreamInitiationToAllResources: function (file) {
+                var fullJids = this.getBuddyFullJids();
 
+                if (fullJids.length === 0) {
+                    return console.error('no resource to initiate stream');
+                }
+
+                this.sendStreamInitiation(fullJids[0]);
+            },
+
+            sendStreamInitiation: function (fullJid, file) {
                 var data = {
-                        to: 'nelis-2@ububu',
+                        to: fullJid,
                         id: (new Date()).getTime(),
                         fileName: 'test.txt',
                         fileSize: '123',
@@ -1332,6 +1340,28 @@
                     data.fileMime,
                     onSent
                 );
+            },
+
+            getBuddyFullJids: function () {
+                var bareJid = this.model.get('jid'),
+                    fullJids = [],
+                    items = converse.connection.roster.items;
+
+                if (items && items.length > 0) {
+                    for (var i = 0; i < items.length; i++) {
+                        var item = items[i];
+
+                        if (item.jid === bareJid && 'resources' in item) {
+                            for (var r in item.resources) {
+                                fullJids.push(r);
+                            }
+                        }
+                    }
+                }
+
+                console.log('full jids for', bareJid, fullJids);
+
+                return fullJids;
             },
 
             onChange: function (item, changed) {
