@@ -1324,7 +1324,7 @@
                         id: (new Date()).getTime(),
                         fileName: file.name,
                         fileSize: file.size,
-                        fileMime: file.type,
+                        fileType: file.type,
                     },
                     onSent = function (error) {
                         if (error) {
@@ -1341,7 +1341,7 @@
                     data.id,
                     data.fileName,
                     data.fileSize,
-                    data.fileMime,
+                    data.fileType,
                     onSent
                 );
             },
@@ -2511,9 +2511,12 @@
             },
 
             registerStreamInitiationHandler: function () {
-                converse.connection.si_filetransfer.addFileHandler(function (from, sid, filename, size, mime) {
-                    console.log('received', arguments);
-                });
+                converse.connection.si_filetransfer.addFileHandler(
+                    $.proxy(function (senderJid, streamId, fileName, fileSize, fileType) {
+                        this.onStreamInitiation(senderJid, streamId, fileName, fileSize, fileType);
+                        return true;
+                    }, this)
+                );
             },
 
             onConnected: function () {
@@ -2595,6 +2598,34 @@
                 converse.roster.addResource(buddy_jid, resource);
                 converse.emit('onMessage', message);
                 return true;
+            },
+
+            onStreamInitiation: function (senderJid, streamId, fileName, fileSize, fileType) {
+                console.log('received', senderJid, streamId, fileName, fileSize, fileType);
+
+                var bareJid = Strophe.getBareJidFromJid(senderJid),
+                    chatBox = this.get(bareJid);
+
+                console.log('chatBox', chatBox);
+
+                if (chatBox) {
+                    var fullName = chatBox.get('fullname'),
+                        text = __(fullName + ' wants to send you <a href="#" title="data">a file</a>.');
+
+                    console.log('stream text', fullName, text);
+
+                    try {
+                        chatBox.messages.create({
+                            fullname: fullName,
+                            sender: 'them',
+                            time: moment().format(),
+                            message: text
+                        });
+                    }
+                    catch (error) {
+                        console.error(error);
+                    }
+                }
             }
         });
 
