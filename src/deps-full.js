@@ -12,6 +12,7 @@ define("converse-dependencies", [
     "strophe.vcard",
     "strophe.disco",
     "strophe.ibb",
+    "strophe.outofband",
     "strophe.si-filetransfer"
 ], function(otr, moment) {
     return {

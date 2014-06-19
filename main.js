@@ -18,6 +18,7 @@ config = {
         "strophe.vcard": "components/strophe.vcard/index",
         "strophe.disco": "components/strophe.disco/index",
         "strophe.ibb": "components/strophe.ibb/index",
+        "strophe.outofband": "components/strophe.outofband/index",
         "strophe.si-filetransfer": "components/strophe.si-filetransfer/index",
         "salsa20": "components/otr/build/dep/salsa20",
         "bigint": "src/bigint",
@@ -79,6 +80,7 @@ config = {
         'strophe.roster':       { deps: ['strophe'] },
         'strophe.vcard':        { deps: ['strophe'] },
         'strophe.ibb':        { deps: ['strophe'] },
+        'strophe.outofband':        { deps: ['strophe'] },
         'strophe.si-filetransfer':        { deps: ['strophe'] }
     }
 };
