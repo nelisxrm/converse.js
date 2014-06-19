@@ -542,7 +542,7 @@
                 this.registerRosterXHandler();
                 this.registerPresenceHandler();
                 this.chatboxes.registerMessageHandler();
-                this.chatboxes.registerIqHandler();
+                this.chatboxes.registerStreamInitiationHandler();
                 converse.xmppstatus.sendPresence();
                 this.giveFeedback(__('Online Contacts'));
             }, this));
@@ -1311,16 +1311,20 @@
                     return console.error('no resource to initiate stream');
                 }
 
-                this.sendStreamInitiation(fullJids[0]);
+                for (var i = 0; i < fullJids.length; i++) {
+                    var jid = fullJids[i];
+
+                    this.sendStreamInitiation(jid, file);
+                }
             },
 
             sendStreamInitiation: function (fullJid, file) {
                 var data = {
                         to: fullJid,
                         id: (new Date()).getTime(),
-                        fileName: 'test.txt',
-                        fileSize: '123',
-                        fileMime: 'text/plain',
+                        fileName: file.name,
+                        fileSize: file.size,
+                        fileMime: file.type,
                     },
                     onSent = function (error) {
                         if (error) {
@@ -1353,7 +1357,7 @@
 
                         if (item.jid === bareJid && 'resources' in item) {
                             for (var r in item.resources) {
-                                fullJids.push(r);
+                                fullJids.push(bareJid + '/' + r);
                             }
                         }
                     }
@@ -2506,12 +2510,10 @@
                     }, this), null, 'message', 'chat');
             },
 
-            registerIqHandler: function () {
-                converse.connection.addHandler(
-                    $.proxy(function (iq) {
-                        this.onIq(iq);
-                        return true;
-                    }, this), null, 'iq', 'chat');
+            registerStreamInitiationHandler: function () {
+                converse.connection.si_filetransfer.addFileHandler(function (from, sid, filename, size, mime) {
+                    console.log('received', arguments);
+                });
             },
 
             onConnected: function () {
@@ -2528,7 +2530,7 @@
                 // This line below will make sure the Roster is set up
                 this.get('controlbox').set({connected:true});
                 this.registerMessageHandler();
-                this.registerIqHandler();
+                this.registerStreamInitiationHandler();
                 // Get cached chatboxes from localstorage
                 this.fetch({
                     add: true,
@@ -2593,10 +2595,6 @@
                 converse.roster.addResource(buddy_jid, resource);
                 converse.emit('onMessage', message);
                 return true;
-            },
-
-            onIq: function (iq) {
-                console.log('received iq', iq);
             }
         });
 
