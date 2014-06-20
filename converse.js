@@ -900,7 +900,8 @@
                 'click .toggle-call': 'toggleCall',
                 'mousedown .dragresize-tm': 'onDragResizeStart',
                 'click .toggle-filetransfer': 'toggleFiletransferMenu',
-                'click .toggle-filetransfer .validation': 'initializeFiletransfer'
+                'click .toggle-filetransfer .validation': 'proposeFiletransfer',
+                'click .chat-filetransfer-accept': 'acceptFiletransfer'
             },
 
             initialize: function (){
@@ -967,9 +968,9 @@
             },
 
             showFiletransferNotification: function (message, acceptLabel, refuseLabel) {
-                var acceptLink = '<a href="#" title="">' + acceptLabel + '</a>',
-                    refuseLink = '<a href="#" title="">' + refuseLabel + '</a>',
-                    controls = $('<div/>').html(acceptLink + refuseLink),
+                var acceptLink = '<a class="chat-filetransfer-accept" href="#" title="">' + acceptLabel + '</a>',
+                    refuseLink = '<a class="chat-filetransfer-refuse" href="#" title="">' + refuseLabel + '</a>',
+                    controls = $('<div/>').html(acceptLink + '&nbsp;' + refuseLink),
                     chatContent = this.$el.find('.chat-content');
 
                 chatContent.find('div.chat-event').remove().end()
@@ -1292,7 +1293,7 @@
                 this.$el.find('.toggle-filetransfer ul').slideToggle(200);
             },
 
-            initializeFiletransfer: function (ev) {
+            proposeFiletransfer: function (ev) {
                 var input, files, file;
 
                 ev.preventDefault();
@@ -1377,6 +1378,43 @@
                 console.log('full jids for', bareJid, fullJids);
 
                 return fullJids;
+            },
+
+            acceptFiletransfer: function (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+
+                // console.log('matching model', this, converse.chatboxes);
+                // sender jid
+                //
+            },
+
+            sendStreamApproval: function (senderJid, streamId) {
+                var data = {
+                        to: fullJid,
+                        id: (new Date).getTime(),
+                        fileName: file.name,
+                        fileSize: file.size,
+                        fileType: file.type,
+                    },
+                    onSent = function (error) {
+                        if (error) {
+                            return console.error(error);
+                        }
+
+                        console.info('sent', data);
+                    };
+
+                console.info('sending', data);
+
+                converse.connection.si_filetransfer.send(
+                    data.to,
+                    data.id,
+                    data.fileName,
+                    data.fileSize,
+                    data.fileType,
+                    onSent
+                );
             },
 
             onChange: function (item, changed) {
@@ -2621,16 +2659,6 @@
                             refuseLabel = __('Refuse');
 
                         chatBoxView.showFiletransferNotification(text, acceptLabel, refuseLabel);
-
-                        /*
-
-                            chatBox.messages.create({
-                                fullname: fullName,
-                                sender: 'them',
-                                time: moment().format(),
-                                message: text//$('<div>' + text + '</div>').html()
-                            });
-                    */
                     }
                 }
                 catch (e) {
