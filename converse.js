@@ -966,6 +966,17 @@
                 this.scrollDown();
             },
 
+            showFiletransferNotification: function (message, acceptLabel, refuseLabel) {
+                var acceptLink = '<a href="#" title="">' + acceptLabel + '</a>',
+                    refuseLink = '<a href="#" title="">' + refuseLabel + '</a>',
+                    controls = $('<div/>').html(acceptLink + refuseLink),
+                    chatContent = this.$el.find('.chat-content');
+
+                chatContent.find('div.chat-event').remove().end()
+                    .append($('<div class="chat-event"></div>').html(message).append(controls));
+                this.scrollDown();
+            },
+
             clearChatRoomMessages: function (ev) {
                 ev.stopPropagation();
                 var result = confirm(__("Are you sure you want to clear the messages from this room?"));
@@ -1321,7 +1332,7 @@
             sendStreamInitiation: function (fullJid, file) {
                 var data = {
                         to: fullJid,
-                        id: (new Date()).getTime(),
+                        id: (new Date).getTime(),
                         fileName: file.name,
                         fileSize: file.size,
                         fileType: file.type,
@@ -2586,6 +2597,47 @@
                 return true;
             },
 
+            onStreamInitiation: function (senderJid, streamId, fileName, fileSize, fileType) {
+                console.log('received', senderJid, streamId, fileName, fileSize, fileType);
+
+                try {
+                    var bareJid = Strophe.getBareJidFromJid(senderJid),
+                        chatBox = this.getChatBoxFromBuddyJid(bareJid),
+                        chatBoxView = converse.chatboxviews.get(chatBox.id);
+
+                    console.log('chatBox', chatBox);
+                    console.log('chatBoxView', chatBoxView);
+
+                    if (chatBox) {
+                        var fullName = chatBox.get('fullname'),
+                            metadataString = 'Size: ' + fileSize + 'b, Type: ' + fileType,
+                            text = __(
+                                fullName + ' wants to send you the file ' +
+                                '<span style="font-style:italic;" title="' + metadataString + '">' +
+                                fileName +
+                                '</span>.'
+                            ),
+                            acceptLabel = __('Accept'),
+                            refuseLabel = __('Refuse');
+
+                        chatBoxView.showFiletransferNotification(text, acceptLabel, refuseLabel);
+
+                        /*
+
+                            chatBox.messages.create({
+                                fullname: fullName,
+                                sender: 'them',
+                                time: moment().format(),
+                                message: text//$('<div>' + text + '</div>').html()
+                            });
+                    */
+                    }
+                }
+                catch (e) {
+                    console.error(e);
+                }
+            },
+
             getChatBoxFromBuddyJid: function (buddyJid) {
                 var chatBox = this.get(buddyJid);
 
@@ -2613,32 +2665,6 @@
                 }
 
                 return chatBox;
-            },
-
-            onStreamInitiation: function (senderJid, streamId, fileName, fileSize, fileType) {
-                console.log('received', senderJid, streamId, fileName, fileSize, fileType);
-
-                var bareJid = Strophe.getBareJidFromJid(senderJid),
-                    chatBox = this.getChatBoxFromBuddyJid(bareJid);
-
-                console.log('chatBox', chatBox);
-
-                if (chatBox) {
-                    var fullName = chatBox.get('fullname'),
-                        text = __(fullName + ' wants to send you <a href="#" title="data">a file</a>.');
-
-                    try {
-                        chatBox.messages.create({
-                            fullname: fullName,
-                            sender: 'them',
-                            time: moment().format(),
-                            message: text
-                        });
-                    }
-                    catch (error) {
-                        console.error(error);
-                    }
-                }
             }
         });
 
