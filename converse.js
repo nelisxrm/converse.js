@@ -2573,46 +2573,59 @@
                     buddy_jid = from;
                     resource = Strophe.getResourceFromJid(message_from);
                 }
-                chatbox = this.get(buddy_jid);
-                roster_item = converse.roster.get(buddy_jid);
 
-                if (roster_item === undefined) {
-                    // The buddy was likely removed
-                    converse.log('Could not get roster item for JID '+buddy_jid, 'error');
+                chatbox = this.getChatBoxFromBuddyJid(buddy_jid);
+
+                if (!chatbox) {
                     return true;
                 }
 
-                if (!chatbox) {
-                    var fullname = roster_item.get('fullname');
-                    fullname = _.isEmpty(fullname)? buddy_jid: fullname;
-                    chatbox = this.create({
-                        'id': buddy_jid,
-                        'jid': buddy_jid,
-                        'fullname': fullname,
-                        'image_type': roster_item.get('image_type'),
-                        'image': roster_item.get('image'),
-                        'url': roster_item.get('url')
-                    });
-                }
                 chatbox.receiveMessage($message);
                 converse.roster.addResource(buddy_jid, resource);
                 converse.emit('onMessage', message);
                 return true;
             },
 
+            getChatBoxFromBuddyJid: function (buddyJid) {
+                var chatBox = this.get(buddyJid);
+
+                if (!chatBox) {
+                    var rosterItem = converse.roster.get(buddyJid),
+                        fullname;
+
+                    if (typeof rosterItem === 'undefined') {
+                        // The buddy was likely removed
+                        converse.log('Could not get roster item for JID ' + buddyJid, 'error');
+                        return null;
+                    }
+
+                    fullname = rosterItem.get('fullname');
+                    fullname = _.isEmpty(fullname) ? buddyJid : fullname;
+
+                    chatBox = this.create({
+                        'id': buddyJid,
+                        'jid': buddyJid,
+                        'fullname': fullname,
+                        'image_type': rosterItem.get('image_type'),
+                        'image': rosterItem.get('image'),
+                        'url': rosterItem.get('url')
+                    });
+                }
+
+                return chatBox;
+            },
+
             onStreamInitiation: function (senderJid, streamId, fileName, fileSize, fileType) {
                 console.log('received', senderJid, streamId, fileName, fileSize, fileType);
 
                 var bareJid = Strophe.getBareJidFromJid(senderJid),
-                    chatBox = this.get(bareJid);
+                    chatBox = this.getChatBoxFromBuddyJid(bareJid);
 
                 console.log('chatBox', chatBox);
 
                 if (chatBox) {
                     var fullName = chatBox.get('fullname'),
                         text = __(fullName + ' wants to send you <a href="#" title="data">a file</a>.');
-
-                    console.log('stream text', fullName, text);
 
                     try {
                         chatBox.messages.create({
