@@ -543,7 +543,7 @@
                 this.registerRosterXHandler();
                 this.registerPresenceHandler();
                 this.chatboxes.registerMessageHandler();
-                this.chatboxes.registerStreamInitiationHandler();
+                this.chatboxes.registerDataHandler();
                 converse.xmppstatus.sendPresence();
                 this.giveFeedback(__('Online Contacts'));
             }, this));
@@ -1295,34 +1295,39 @@
             },
 
             proposeFiletransfer: function (ev) {
-                var input, files, file, metadata;
+                try {
+                    var input, files, file, metadata;
 
-                ev.preventDefault();
-                ev.stopPropagation();
+                    ev.preventDefault();
+                    ev.stopPropagation();
 
-                input = $('.toggle-filetransfer .file');
-                console.log('input', input);
+                    input = $('.toggle-filetransfer .file');
+                    console.log('input', input);
 
-                files = (input.length > 0) && input[0].files;
-                console.log('files', files);
+                    files = (input.length > 0) && input[0].files;
+                    console.log('files', files);
 
-                if (!files || files.length === 0) {
-                    console.log('please select a file');
-                    return;
+                    if (!files || files.length === 0) {
+                        console.log('please select a file');
+                        return;
+                    }
+
+                    file = files[0];
+                    console.log('file', file);
+
+                    metadata = {
+                        type: 'metadata',
+                        senderJid: Strophe.getBareJidFromJid(converse.connection.jid),
+                        fileName: file.name,
+                        fileSize: file.size,
+                        fileType: file.type
+                    };
+
+                    this.sendFileMetadata(metadata);
                 }
-
-                file = files[0];
-                console.log('file', file);
-
-                metadata = {
-                    type: 'metadata',
-                    senderJid: Strophe.getBareJidFromJid(converse.connection.jid),
-                    fileName: file.name,
-                    fileSize: file.size,
-                    fileType: file.type
-                };
-
-                this.sendFileMetadata(metadata);
+                catch (e) {
+                    console.error(e);
+                }
             },
 
             sendFileMetadata: function (metadata) {
@@ -2488,7 +2493,7 @@
 
             registerDataHandler: function () {
                 converse.peerTransfer.registerDataHandler(function (connection, data) {
-                    console.info('received', data, 'from', connection);
+                    console.info('called back');
 
                     if (data.type && data.type === 'metadata') {
                         var handler = this.onFileProposal.bind(this);
@@ -3873,7 +3878,7 @@
             this.chatboxviews = new this.ChatBoxViews({model: this.chatboxes});
             this.controlboxtoggle = new this.ControlBoxToggle();
             this.otr = new this.OTR();
-            this.peerTransfer = new PeerTransfer(Strophe.getBareJidFromJid(this.jid), {});
+            this.peerTransfer = new PeerTransfer(Strophe.getBareJidFromJid(this.jid));
             console.log('this.peerTransfer', this.peerTransfer);
         };
 

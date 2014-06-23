@@ -26,6 +26,7 @@ PeerTransfer.prototype.initialize = function (peerId, options) {
 
     this.peer = new Peer(formattedPeerId, {host: host, port: port, key: key});
 
+    this.handleWindowClosing();
     this.handleReceivedConnections();
 
     console.info('PeerTransfer initialized', this);
@@ -63,7 +64,11 @@ PeerTransfer.prototype.send = function (connection, data) {
 PeerTransfer.prototype.getConnection = function (remotePeerId) {
     var connection = this.getExistingConnection(remotePeerId);
 
-    if (!connection) {
+    if (connection && !connection.open) {
+        this.deregisterConnection(connection);
+    }
+
+    if (!connection || !connection.open) {
         connection = this.peer.connect(remotePeerId);
 
         this.registerConnection(connection);
@@ -73,7 +78,19 @@ PeerTransfer.prototype.getConnection = function (remotePeerId) {
 };
 
 PeerTransfer.prototype.getExistingConnection = function (remotePeerId) {
-    return this.connections[0];
+    return this.connections[0] || null;
+};
+
+PeerTransfer.prototype.handleWindowClosing = function () {
+    var self = this;
+
+    window.addEventListener('beforeunload', function () {
+        var peer = self.peer;
+
+        console.log('diconnecting peer', peer);
+
+        peer && peer.destroy();
+    });
 };
 
 PeerTransfer.prototype.handleReceivedConnections = function () {
@@ -82,6 +99,12 @@ PeerTransfer.prototype.handleReceivedConnections = function () {
     this.peer.on('connection', function (connection) {
         self.registerConnection(connection);
     })
+};
+
+PeerTransfer.prototype.deregisterConnection = function (connection) {
+    var index = this.connections.indexOf(connection);
+
+    this.connections.splice(index, 1);
 };
 
 PeerTransfer.prototype.registerConnection = function (connection) {
@@ -103,7 +126,7 @@ PeerTransfer.prototype.onDataReceived = function (connection, data) {
     this.dataHandler && this.dataHandler(connection, data);
 };
 
-PeerTransfer.getFormattedPeerId = function(peerId) {
+PeerTransfer.getFormattedPeerId = function (peerId) {
     var formattedPeerId = peerId.replace(/\W/g, '_');
 
     return formattedPeerId;
