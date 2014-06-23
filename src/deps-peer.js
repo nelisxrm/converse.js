@@ -11,6 +11,7 @@ define("converse-dependencies", [
     "strophe.roster",
     "strophe.vcard",
     "strophe.disco",
+    "peer-transfer"
 ], function(otr, moment) {
     return {
         'otr': otr,

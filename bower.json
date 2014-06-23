@@ -28,10 +28,8 @@
     "momentjs": "~2.6.0",
     "jquery.browser": "~0.0.6",
     "backbone.overview": "*",
-    "strophe.ibb": "https://raw.githubusercontent.com/g8g3/strophejs-plugins/outofband/ibb/strophe.ibb.js",
-    "strophe.outofband": "https://raw.githubusercontent.com/g8g3/strophejs-plugins/outofband/outofband/strophe.outofband.js",
-    "strophe.si-filetransfer": "https://raw.githubusercontent.com/g8g3/strophejs-plugins/outofband/si-filetransfer/strophe.si-filetransfer.js",
-    "peerjs": "~0.3.8"
+    "peerjs": "~0.3.8",
+    "peer-transfer": "git@github.com:g8g3/peer-transfer.git"
   },
   "exportsOverride": {}
 }

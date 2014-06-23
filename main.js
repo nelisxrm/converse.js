@@ -17,9 +17,6 @@ config = {
         "strophe.roster": "components/strophe.roster/index",
         "strophe.vcard": "components/strophe.vcard/index",
         "strophe.disco": "components/strophe.disco/index",
-        "strophe.ibb": "components/strophe.ibb/index",
-        "strophe.outofband": "components/strophe.outofband/index",
-        "strophe.si-filetransfer": "components/strophe.si-filetransfer/index",
         "salsa20": "components/otr/build/dep/salsa20",
         "bigint": "src/bigint",
         "crypto.core": "components/otr/vendor/cryptojs/core",
@@ -37,7 +34,9 @@ config = {
         "eventemitter": "components/otr/build/dep/eventemitter",
         "moment": "components/momentjs/moment",
         "otr": "components/otr/build/otr",
-        "converse-dependencies": "src/deps-full"
+        "peer": "components/peerjs/peer",
+        "peer-transfer": "components/peer-transfer/peer-transfer",
+        "converse-dependencies": "src/deps-peer"
     },
 
     tpl: {
@@ -79,9 +78,7 @@ config = {
         'strophe.muc':          { deps: ['strophe', 'jquery'] },
         'strophe.roster':       { deps: ['strophe'] },
         'strophe.vcard':        { deps: ['strophe'] },
-        'strophe.ibb':        { deps: ['strophe'] },
-        'strophe.outofband':        { deps: ['strophe'] },
-        'strophe.si-filetransfer':        { deps: ['strophe'] },
+        'peer-transfer':        { deps: ['peer'] }
     }
 };
 
