@@ -543,7 +543,7 @@
                 this.registerRosterXHandler();
                 this.registerPresenceHandler();
                 this.chatboxes.registerMessageHandler();
-                this.chatboxes.registerDataHandler();
+                this.chatboxes.registerPeerTransferHandler();
                 converse.xmppstatus.sendPresence();
                 this.giveFeedback(__('Online Contacts'));
             }, this));
@@ -1315,38 +1315,41 @@
                     file = files[0];
                     console.log('file', file);
 
-                    metadata = {
-                        type: 'metadata',
-                        senderJid: Strophe.getBareJidFromJid(converse.connection.jid),
-                        fileName: file.name,
-                        fileSize: file.size,
-                        fileType: file.type
-                    };
-
-                    this.sendFileMetadata(metadata);
+                    this.sendFileProposal(file);
                 }
                 catch (e) {
                     console.error(e);
                 }
             },
 
-            sendFileMetadata: function (metadata) {
-                var remoteJid = Strophe.getBareJidFromJid(this.model.get('jid'));
+            sendFileProposal: function (file) {
+                var remoteJid = Strophe.getBareJidFromJid(this.model.get('jid')),
+                    data = {
+                        type: 'proposal',
+                        senderJid: Strophe.getBareJidFromJid(converse.connection.jid),
+                        fileName: file.name,
+                        fileSize: file.size,
+                        fileType: file.type
+                    };
 
-                converse.peerTransfer.sendData(remoteJid, metadata);
+                converse.peerTransfer.send(remoteJid, data);
             },
 
             acceptFiletransfer: function (ev) {
                 ev.preventDefault();
                 ev.stopPropagation();
 
-                // console.log('matching model', this, converse.chatboxes);
-                // sender jid
-                //
+                var fileSenderJid = Strophe.getBareJidFromJid(this.model.get('jid'));
+
+                this.sendFileApproval(fileSenderJid);
             },
 
             sendFileApproval: function (fileSenderJid) {
-                //
+                var approvalData = {
+
+                };
+
+                converse.peerTransfer.sendData(fileSenderJid, approvalData);
             },
 
             onChange: function (item, changed) {
@@ -2491,18 +2494,25 @@
                     }, this), null, 'message', 'chat');
             },
 
-            registerDataHandler: function () {
-                converse.peerTransfer.registerDataHandler(function (connection, data) {
-                    console.info('called back');
+            registerPeerTransferHandler: function () {
+                var self = this;
 
-                    if (data.type && data.type === 'metadata') {
-                        var handler = this.onFileProposal.bind(this);
-                        handler(connection, data);
-                    }
-                    else {
-                        console.log('this is the actual file');
-                    }
-                });
+                try {
+                    converse.peerTransfer.on('proposal', function (transfer, data) {
+                    });
+
+                    converse.peerTransfer.on('response', function (transfer, data) {
+                    });
+
+                    converse.peerTransfer.on('file', function (transfer, data) {
+                    });
+
+                    converse.peerTransfer.on('receipt', function (transfer, data) {
+                    });
+                }
+                catch (e) {
+                    console.error(e);
+                }
             },
 
             onConnected: function () {
@@ -2519,8 +2529,7 @@
                 // This line below will make sure the Roster is set up
                 this.get('controlbox').set({connected:true});
                 this.registerMessageHandler();
-                this.registerStreamInitiationHandler();
-                this.registerDataHandler();
+                this.registerPeerTransferHandler();
                 // Get cached chatboxes from localstorage
                 this.fetch({
                     add: true,
@@ -2585,11 +2594,11 @@
 
                     if (chatBox) {
                         var fullName = chatBox.get('fullname'),
-                            metadataString = 'Size: ' + fileSize + 'b, Type: ' + fileType,
+                            info = 'Size: ' + metadata.fileSize + 'b, Type: ' + metadata.fileType,
                             text = __(
                                 fullName + ' wants to send you the file ' +
-                                '<span style="font-style:italic;" title="' + metadataString + '">' +
-                                fileName +
+                                '<span style="font-style:italic;" title="' + info + '">' +
+                                metadata.fileName +
                                 '</span>.'
                             ),
                             acceptLabel = __('Accept'),

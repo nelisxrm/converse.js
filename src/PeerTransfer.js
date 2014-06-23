@@ -1,13 +1,18 @@
 var PeerTransfer = function (peerId, options) {
     this.peer = null;
-    this.connections = [];
-    this.dataHandler = null;
+    this.transfers = [];
+    this.handlers = {
+        proposal: [],
+        response: [],
+        file: [],
+        receipt: []
+    };
 
     this.initialize(peerId, options);
 
     return {
-        sendData: this.sendData.bind(this),
-        registerDataHandler: this.registerDataHandler.bind(this)
+        on: this.on.bind(this),
+        send: this.send.bind(this)
     };
 };
 
@@ -32,53 +37,97 @@ PeerTransfer.prototype.initialize = function (peerId, options) {
     console.info('PeerTransfer initialized', this);
 };
 
-PeerTransfer.prototype.registerDataHandler = function (handler) {
+/**
+ * Registers the given handler to be called when the given event occurs.
+ * @param  {String} type
+ * @param  {Function} handler
+ */
+PeerTransfer.prototype.on = function (type, handler) {
+    var handlersOfGivenType;
+
     if (handler && typeof handler !== 'function') {
-        throw new Error('Data handler must be a function.');
+        throw new Error('Handler must be a function.');
     }
 
-    this.dataHandler = handler;
+    handlersOfGivenType = this.getHandlersByType(type);
+
+    handlersOfGivenType.push(handler);
 };
 
-PeerTransfer.prototype.sendData = function (remotePeerId, data) {
-    var self = this,
-        formattedRemotePeerId = PeerTransfer.getFormattedPeerId(remotePeerId),
-        connection = this.getConnection(formattedRemotePeerId);
+/**
+ * Sends given data to peer corresponding to given remote ID.
+ * @param  {String} remotePeerId
+ * @param  {Object} data
+ */
+PeerTransfer.prototype.send = function (remotePeerId, data) {
+    var formattedRemotePeerId = PeerTransfer.getFormattedPeerId(remotePeerId),
+        transfer = this.getTransfer(formattedRemotePeerId);
 
-    if (connection.open) {
-        this.send(connection, data);
+    if (transfer.isOpen()) {
+        send(transfer, data);
     }
     else {
-        connection.on('open', function () {
-            self.send(connection, data);
+        transfer.connection.on('open', function () {
+            send(transfer, data);
         });
     }
+
+    function send(transfer, data) {
+        console.info('sending data', data, 'to', transfer.connection.peer);
+
+        transfer.connection.send(data);
+    }
 };
 
-PeerTransfer.prototype.send = function (connection, data) {
-    console.info('sending data', data, 'to', connection.peer);
+PeerTransfer.prototype.getHandlersByType = function (type) {
+    var handlers;
 
-    connection.send(data);
-};
-
-PeerTransfer.prototype.getConnection = function (remotePeerId) {
-    var connection = this.getExistingConnection(remotePeerId);
-
-    if (connection && !connection.open) {
-        this.deregisterConnection(connection);
+    if (!type) {
+        throw new Error('Handler type must be defined.');
     }
 
-    if (!connection || !connection.open) {
-        connection = this.peer.connect(remotePeerId);
+    handlers = this.handlers[type];
 
-        this.registerConnection(connection);
+    if (!handlers) {
+        throw new Error('No such type of handlers.');
     }
 
-    return connection;
+    return handlers;
+}
+
+PeerTransfer.prototype.getTransfer = function (remotePeerId) {
+    var transfer = this.getExistingTransfer(remotePeerId);
+
+    if (transfer && !transfer.isOpen()) {
+        this.deregisterTransfer(transfer);
+    }
+
+    if (!transfer || !transfer.isOpen()) {
+        var connection = this.peer.connect(remotePeerId);
+
+        transfer = this.getNewTransfer(connection);
+
+        this.registerTransfer(transfer);
+    }
+
+    return transfer;
 };
 
-PeerTransfer.prototype.getExistingConnection = function (remotePeerId) {
-    return this.connections[0] || null;
+PeerTransfer.prototype.getNewTransfer = function (connection) {
+    var transfer = {
+        connection: connection,
+        file: null,
+        approved: false,
+        isOpen: function () {
+            return this.connection && this.connection.open;
+        }
+    };
+
+    return transfer;
+};
+
+PeerTransfer.prototype.getExistingTransfer = function (remotePeerId) {
+    return this.transfers[0] || null; // TODO: filter
 };
 
 PeerTransfer.prototype.handleWindowClosing = function () {
@@ -97,33 +146,47 @@ PeerTransfer.prototype.handleReceivedConnections = function () {
     var self = this;
 
     this.peer.on('connection', function (connection) {
-        self.registerConnection(connection);
+        var transfer = self.getNewTransfer(connection);
+        self.registerTransfer(transfer);
     })
 };
 
-PeerTransfer.prototype.deregisterConnection = function (connection) {
-    var index = this.connections.indexOf(connection);
+PeerTransfer.prototype.deregisterTransfer = function (transfer) {
+    var index = this.transfers.indexOf(transfer);
 
-    this.connections.splice(index, 1);
+    this.transfers.splice(index, 1);
 };
 
-PeerTransfer.prototype.registerConnection = function (connection) {
-    this.connections.push(connection);
-    this.handleReceivedDataOnConnection(connection);
+PeerTransfer.prototype.registerTransfer = function (transfer) {
+    this.transfers.push(transfer);
+    this.handleTransferReceivedData(transfer);
 };
 
-PeerTransfer.prototype.handleReceivedDataOnConnection = function (connection) {
+PeerTransfer.prototype.handleTransferReceivedData = function (transfer) {
     var self = this;
 
-    connection.on('data', function (data) {
-        self.onDataReceived(connection, data)
+    transfer.connection.on('data', function (data) {
+        self.onDataReceived(transfer, data)
     });
 };
 
-PeerTransfer.prototype.onDataReceived = function (connection, data) {
-    console.info('received', data, 'from', connection.peer);
+PeerTransfer.prototype.onDataReceived = function (transfer, data) {
+    var type, handlersOfGivenType;
 
-    this.dataHandler && this.dataHandler(connection, data);
+    console.info('received', data, 'from', transfer.connection.peer);
+
+    if (!data) {
+        return;
+    }
+
+    type = data.type;
+    handlersOfGivenType = this.getHandlersByType(type);
+
+    for (var i = 0; i < handlersOfGivenType.length; i++) {
+        var handler = handlersOfGivenType[i];
+
+        handler(transfer, data);
+    }
 };
 
 PeerTransfer.getFormattedPeerId = function (peerId) {
