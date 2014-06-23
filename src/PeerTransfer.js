@@ -59,23 +59,27 @@ PeerTransfer.prototype.on = function (type, handler) {
  * @param  {String} remotePeerId
  * @param  {Object} data
  */
-PeerTransfer.prototype.send = function (remotePeerId, data) {
+PeerTransfer.prototype.send = function (remotePeerId, data, callback) {
     var formattedRemotePeerId = PeerTransfer.getFormattedPeerId(remotePeerId),
         transfer = this.getTransfer(formattedRemotePeerId);
 
     if (transfer.isOpen()) {
-        send(transfer, data);
+        doSend(transfer, data);
     }
     else {
         transfer.connection.on('open', function () {
-            send(transfer, data);
+            doSend(transfer, data);
         });
     }
 
-    function send(transfer, data) {
+    function doSend(transfer, data) {
         console.info('sending data', data, 'to', transfer.connection.peer);
 
         transfer.connection.send(data);
+
+        if (typeof callback === 'function') {
+            callback(transfer, data);
+        }
     }
 };
 
@@ -117,7 +121,6 @@ PeerTransfer.prototype.getNewTransfer = function (connection) {
     var transfer = {
         connection: connection,
         file: null,
-        approved: false,
         isOpen: function () {
             return this.connection && this.connection.open;
         }
