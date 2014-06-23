@@ -968,7 +968,7 @@
                 this.scrollDown();
             },
 
-            showFiletransferNotification: function (message, acceptLabel, refuseLabel) {
+            showFileProposalNotification: function (message, acceptLabel, refuseLabel) {
                 var acceptLink = '<a class="chat-filetransfer-accept" href="#" title="">' + acceptLabel + '</a>',
                     refuseLink = '<a class="chat-filetransfer-refuse" href="#" title="">' + refuseLabel + '</a>',
                     controls = $('<div/>').html(acceptLink + '&nbsp;' + refuseLink),
@@ -976,6 +976,14 @@
 
                 chatContent.find('div.chat-event').remove().end()
                     .append($('<div class="chat-event"></div>').html(message).append(controls));
+                this.scrollDown();
+            },
+
+            showFiletransferNotification: function (message) {
+                var chatContent = this.$el.find('.chat-content');
+
+                chatContent.find('div.chat-event').remove().end()
+                    .append($('<div class="chat-event"></div>').html(message));
                 this.scrollDown();
             },
 
@@ -1333,7 +1341,12 @@
                     };
 
                 converse.peerTransfer.send(remoteJid, data, function (transfer, data) {
-                    transfer.file = file;
+                    transfer.file = {
+                        data: file,
+                        name: file.name,
+                        size: file.size,
+                        type: file.type
+                    };
 
                     console.log('attached transfer', transfer);
                 });
@@ -2523,6 +2536,9 @@
                     });
 
                     converse.peerTransfer.on('file', function (transfer, data) {
+                        handler = self.onFileData.bind(self);
+
+                        handler(transfer, data);
                     });
 
                     converse.peerTransfer.on('receipt', function (transfer, data) {
@@ -2621,7 +2637,7 @@
                             acceptLabel = __('Accept'),
                             refuseLabel = __('Refuse');
 
-                        chatBoxView.showFiletransferNotification(text, acceptLabel, refuseLabel);
+                        chatBoxView.showFileProposalNotification(text, acceptLabel, refuseLabel);
                     }
                 }
                 catch (e) {
@@ -2647,6 +2663,30 @@
 
             onFileRefusal: function (transfer, data) {
                 console.log('refused');
+            },
+
+            onFileData: function (transfer, data) {
+                try {
+                var bareJid = Strophe.getBareJidFromJid(data.fileSenderJid),
+                    chatBox = this.getChatBoxFromBuddyJid(bareJid),
+                    chatBoxView = converse.chatboxviews.get(chatBox.id),
+                    file = data.file,
+                    intArray = new Uint8Array(file.data),
+                    blob = new Blob([intArray], {type: file.type}),
+                    url = window.URL.createObjectURL(blob);
+
+                    console.log('chatBox', chatBox);
+                    console.log('chatBoxView', chatBoxView);
+
+                    if (chatBox) {
+                        var message = '<a href="' + url + '" target="_blank" download="' + file.name + '">Download file.</a>';
+
+                        chatBoxView.showFiletransferNotification(message);
+                    }
+                }
+                catch (e) {
+                    console.error(e);
+                }
             },
 
             getChatBoxFromBuddyJid: function (buddyJid) {
