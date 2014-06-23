@@ -81,7 +81,7 @@ config = {
         'strophe.vcard':        { deps: ['strophe'] },
         'strophe.ibb':        { deps: ['strophe'] },
         'strophe.outofband':        { deps: ['strophe'] },
-        'strophe.si-filetransfer':        { deps: ['strophe'] }
+        'strophe.si-filetransfer':        { deps: ['strophe'] },
     }
 };
 

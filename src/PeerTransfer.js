@@ -6,9 +6,9 @@ var PeerTransfer = function (peerId, options) {
     this.initialize(peerId, options);
 
     return {
-        sendData: this.sendData,
-        registerDataHandler: this.registerDataHandler
-    }
+        sendData: this.sendData.bind(this),
+        registerDataHandler: this.registerDataHandler.bind(this)
+    };
 };
 
 PeerTransfer.prototype.initialize = function (peerId, options) {
@@ -16,14 +16,19 @@ PeerTransfer.prototype.initialize = function (peerId, options) {
         host = options.host || 'localhost',
         port = options.port || 9000,
         key = options.key || 'peerjs';
+        formattedPeerId = PeerTransfer.getFormattedPeerId(peerId);
 
     if (!peerId) {
         throw new Error('Peer ID is required.');
     }
 
-    this.peer = new Peer(peerId, {host: host, port: port, key: key});
+    console.log('peerId', peerId, 'formattedPeerId', formattedPeerId);
+
+    this.peer = new Peer(formattedPeerId, {host: host, port: port, key: key});
 
     this.handleReceivedConnections();
+
+    console.info('PeerTransfer initialized', this);
 };
 
 PeerTransfer.prototype.registerDataHandler = function (handler) {
@@ -36,7 +41,8 @@ PeerTransfer.prototype.registerDataHandler = function (handler) {
 
 PeerTransfer.prototype.sendData = function (remotePeerId, data) {
     var self = this,
-        connection = this.getConnection(remotePeerId);
+        formattedRemotePeerId = PeerTransfer.getFormattedPeerId(remotePeerId),
+        connection = this.getConnection(formattedRemotePeerId);
 
     if (connection.open) {
         this.send(connection, data);
@@ -49,7 +55,8 @@ PeerTransfer.prototype.sendData = function (remotePeerId, data) {
 };
 
 PeerTransfer.prototype.send = function (connection, data) {
-    console.info('sending data', data);
+    console.info('sending data', data, 'to', connection.peer);
+
     connection.send(data);
 };
 
@@ -91,6 +98,8 @@ PeerTransfer.prototype.handleReceivedDataOnConnection = function (connection) {
 };
 
 PeerTransfer.prototype.onDataReceived = function (connection, data) {
+    console.info('received', data, 'from', connection.peer);
+
     this.dataHandler && this.dataHandler(connection, data);
 };
 

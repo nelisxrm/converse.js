@@ -12,6 +12,7 @@
         define("converse",
               ["converse-dependencies", "converse-templates"],
             function(dependencies, templates) {
+                console.log('dependencies', dependencies);
                 var otr = dependencies.otr,
                     moment = dependencies.moment;
                 if (typeof otr !== "undefined") {
@@ -1294,7 +1295,7 @@
             },
 
             proposeFiletransfer: function (ev) {
-                var input, files, file;
+                var input, files, file, metadata;
 
                 ev.preventDefault();
                 ev.stopPropagation();
@@ -1313,71 +1314,21 @@
                 file = files[0];
                 console.log('file', file);
 
-                this.sendStreamInitiationToAllResources(file);
+                metadata = {
+                    type: 'metadata',
+                    senderJid: Strophe.getBareJidFromJid(converse.connection.jid),
+                    fileName: file.name,
+                    fileSize: file.size,
+                    fileType: file.type
+                };
+
+                this.sendFileMetadata(metadata);
             },
 
-            sendStreamInitiationToAllResources: function (file) {
-                var fullJids = this.getBuddyFullJids();
+            sendFileMetadata: function (metadata) {
+                var remoteJid = Strophe.getBareJidFromJid(this.model.get('jid'));
 
-                if (fullJids.length === 0) {
-                    return console.error('no resource to initiate stream');
-                }
-
-                for (var i = 0; i < fullJids.length; i++) {
-                    var jid = fullJids[i];
-
-                    this.sendStreamInitiation(jid, file);
-                }
-            },
-
-            sendStreamInitiation: function (fullJid, file) {
-                var data = {
-                        to: fullJid,
-                        id: (new Date).getTime(),
-                        fileName: file.name,
-                        fileSize: file.size,
-                        fileType: file.type,
-                    },
-                    onSent = function (error) {
-                        if (error) {
-                            return console.error(error);
-                        }
-
-                        console.info('sent', data);
-                    };
-
-                console.info('sending', data);
-
-                converse.connection.si_filetransfer.send(
-                    data.to,
-                    data.id,
-                    data.fileName,
-                    data.fileSize,
-                    data.fileType,
-                    onSent
-                );
-            },
-
-            getBuddyFullJids: function () {
-                var bareJid = this.model.get('jid'),
-                    fullJids = [],
-                    items = converse.connection.roster.items;
-
-                if (items && items.length > 0) {
-                    for (var i = 0; i < items.length; i++) {
-                        var item = items[i];
-
-                        if (item.jid === bareJid && 'resources' in item) {
-                            for (var r in item.resources) {
-                                fullJids.push(bareJid + '/' + r);
-                            }
-                        }
-                    }
-                }
-
-                console.log('full jids for', bareJid, fullJids);
-
-                return fullJids;
+                converse.peerTransfer.sendData(remoteJid, metadata);
             },
 
             acceptFiletransfer: function (ev) {
@@ -1389,32 +1340,8 @@
                 //
             },
 
-            sendStreamApproval: function (senderJid, streamId) {
-                var data = {
-                        to: fullJid,
-                        id: (new Date).getTime(),
-                        fileName: file.name,
-                        fileSize: file.size,
-                        fileType: file.type,
-                    },
-                    onSent = function (error) {
-                        if (error) {
-                            return console.error(error);
-                        }
-
-                        console.info('sent', data);
-                    };
-
-                console.info('sending', data);
-
-                converse.connection.si_filetransfer.send(
-                    data.to,
-                    data.id,
-                    data.fileName,
-                    data.fileSize,
-                    data.fileType,
-                    onSent
-                );
+            sendFileApproval: function (fileSenderJid) {
+                //
             },
 
             onChange: function (item, changed) {
@@ -2559,13 +2486,18 @@
                     }, this), null, 'message', 'chat');
             },
 
-            registerStreamInitiationHandler: function () {
-                converse.connection.si_filetransfer.addFileHandler(
-                    $.proxy(function (senderJid, streamId, fileName, fileSize, fileType) {
-                        this.onStreamInitiation(senderJid, streamId, fileName, fileSize, fileType);
-                        return true;
-                    }, this)
-                );
+            registerDataHandler: function () {
+                converse.peerTransfer.registerDataHandler(function (connection, data) {
+                    console.info('received', data, 'from', connection);
+
+                    if (data.type && data.type === 'metadata') {
+                        var handler = this.onFileProposal.bind(this);
+                        handler(connection, data);
+                    }
+                    else {
+                        console.log('this is the actual file');
+                    }
+                });
             },
 
             onConnected: function () {
@@ -2583,6 +2515,7 @@
                 this.get('controlbox').set({connected:true});
                 this.registerMessageHandler();
                 this.registerStreamInitiationHandler();
+                this.registerDataHandler();
                 // Get cached chatboxes from localstorage
                 this.fetch({
                     add: true,
@@ -2635,11 +2568,10 @@
                 return true;
             },
 
-            onStreamInitiation: function (senderJid, streamId, fileName, fileSize, fileType) {
-                console.log('received', senderJid, streamId, fileName, fileSize, fileType);
-
+            onFileProposal: function (connection, metadata) {
+                console.log('file proposal');
                 try {
-                    var bareJid = Strophe.getBareJidFromJid(senderJid),
+                    var bareJid = Strophe.getBareJidFromJid(metadata.senderJid),
                         chatBox = this.getChatBoxFromBuddyJid(bareJid),
                         chatBoxView = converse.chatboxviews.get(chatBox.id);
 
@@ -3941,6 +3873,8 @@
             this.chatboxviews = new this.ChatBoxViews({model: this.chatboxes});
             this.controlboxtoggle = new this.ControlBoxToggle();
             this.otr = new this.OTR();
+            this.peerTransfer = new PeerTransfer(Strophe.getBareJidFromJid(this.jid), {});
+            console.log('this.peerTransfer', this.peerTransfer);
         };
 
         // Initialization
