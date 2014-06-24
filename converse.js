@@ -900,7 +900,7 @@
                 'click .auth-otr': 'authOTR',
                 'click .toggle-call': 'toggleCall',
                 'mousedown .dragresize-tm': 'onDragResizeStart',
-                'click .toggle-filetransfer': 'toggleFiletransferMenu',
+                'click .toggle-filetransfer': 'toggleFiletransferMenuIfCorrectTarget',
                 'click .toggle-filetransfer .validation': 'proposeFiletransfer',
                 'click .chat-filetransfer-accept': 'acceptFiletransfer',
                 'click .chat-filetransfer-refuse': 'refuseFiletransfer'
@@ -1294,12 +1294,17 @@
                 });
             },
 
-            toggleFiletransferMenu: function (ev) {
+            toggleFiletransferMenuIfCorrectTarget: function (ev) {
                 ev.stopPropagation();
 
-                if (!ev.target.classList.contains('toggle-filetransfer'))
+                if (!ev.target.classList.contains('toggle-filetransfer')) {
                     return;
+                }
 
+                this.toggleFiletransferMenu();
+            },
+
+            toggleFiletransferMenu: function (ev) {
                 this.$el.find('.toggle-filetransfer ul').slideToggle(200);
             },
 
@@ -1333,13 +1338,15 @@
 
             sendFileProposal: function (file) {
                 var remoteJid = Strophe.getBareJidFromJid(this.model.get('jid')),
+                    fileReceiverFullName = this.model.get('fullname'),
                     data = {
                         type: 'proposal',
                         from: Strophe.getBareJidFromJid(converse.connection.jid),
                         fileName: file.name,
                         fileSize: file.size,
                         fileType: file.type
-                    };
+                    },
+                    message;
 
                 converse.peerTransfer.send(remoteJid, data, function (transfer, data) {
                     transfer.file = {
@@ -1351,6 +1358,11 @@
 
                     console.log('attached transfer', transfer);
                 });
+
+                message = __('Waiting for ' + fileReceiverFullName + ' to accept <span style="font-style: italic;">' + file.name + '</span>.');
+
+                this.toggleFiletransferMenu();
+                this.showFiletransferNotification(message);
             },
 
             acceptFiletransfer: function (ev) {
@@ -2659,13 +2671,21 @@
             onFileApproval: function (transfer, data) {
                 try {
                     var bareJid = Strophe.getBareJidFromJid(data.from),
-                        data = {
+                        file = transfer.file,
+                        dataToSend = {
                             type: 'file',
                             from: Strophe.getBareJidFromJid(converse.connection.jid),
-                            file: transfer.file
-                        };
+                            file: file
+                        },
+                        chatBoxView = this.getChatBoxViewFromBuddyJid(data.from);
 
-                    converse.peerTransfer.send(bareJid, data);
+                    if (chatBoxView && file) {
+                        var message = __('File <span style="font-style: italic;">' + file.name + '</span> accepted.');
+
+                        chatBoxView.showFiletransferNotification(message);
+                    }
+
+                    converse.peerTransfer.send(bareJid, dataToSend);
                 }
                 catch (e) {
                     console.error(e);
@@ -2708,7 +2728,6 @@
             },
 
             getChatBoxFromBuddyJid: function (buddyJid) {
-                debugger;
                 var chatBox = this.get(buddyJid);
 
                 if (!chatBox) {
