@@ -1348,7 +1348,7 @@
                     },
                     message;
 
-                converse.peerTransfer.send(remoteJid, data, function (transfer, data) {
+                converse.peerTransferHandler.send(remoteJid, data, function (transfer, data) {
                     transfer.file = {
                         data: file,
                         name: file.name,
@@ -1394,7 +1394,7 @@
                     approved: approved
                 };
 
-                converse.peerTransfer.send(fileSenderJid, data);
+                converse.peerTransferHandler.send(fileSenderJid, data);
             },
 
             onChange: function (item, changed) {
@@ -2544,13 +2544,13 @@
                     handler;
 
                 try {
-                    converse.peerTransfer.on('proposal', function (transfer, data) {
+                    converse.peerTransferHandler.on('proposal', function (transfer, data) {
                         handler = self.onFileProposal.bind(self);
 
                         handler(transfer, data);
                     });
 
-                    converse.peerTransfer.on('response', function (transfer, data) {
+                    converse.peerTransferHandler.on('response', function (transfer, data) {
                         if (data.approved === true) {
                             handler = self.onFileApproval.bind(self);
                         }
@@ -2561,13 +2561,16 @@
                         handler(transfer, data);
                     });
 
-                    converse.peerTransfer.on('file', function (transfer, data) {
+                    converse.peerTransferHandler.on('file', function (transfer, data) {
                         handler = self.onFileData.bind(self);
 
                         handler(transfer, data);
                     });
 
-                    converse.peerTransfer.on('receipt', function (transfer, data) {
+                    converse.peerTransferHandler.on('receipt', function (transfer, data) {
+                        handler = self.onFileReceipt.bind(self);
+
+                        handler(transfer, data);
                     });
                 }
                 catch (e) {
@@ -2685,7 +2688,7 @@
                         chatBoxView.showFiletransferNotification(message);
                     }
 
-                    converse.peerTransfer.send(bareJid, dataToSend);
+                    converse.peerTransferHandler.send(bareJid, dataToSend);
                 }
                 catch (e) {
                     console.error(e);
@@ -2710,14 +2713,37 @@
 
             onFileData: function (transfer, data) {
                 try {
-                    var chatBoxView = this.getChatBoxViewFromBuddyJid(data.from),
+                    var bareJid = Strophe.getBareJidFromJid(data.from),
+                        chatBoxView = this.getChatBoxViewFromBuddyJid(data.from),
                         file = data.file,
                         intArray = new Uint8Array(file.data),
                         blob = new Blob([intArray], {type: file.type}),
-                        url = window.URL.createObjectURL(blob);
+                        url = window.URL.createObjectURL(blob),
+                        dataToSend = {
+                            type: 'receipt',
+                            from: Strophe.getBareJidFromJid(converse.connection.jid)
+                        };
 
                     if (chatBoxView) {
                         var message = __('<a href="' + url + '" target="_blank" download="' + file.name + '">Download file.</a>');
+
+                        chatBoxView.showFiletransferNotification(message);
+                    }
+
+                    converse.peerTransferHandler.send(bareJid, dataToSend);
+                }
+                catch (e) {
+                    console.error(e);
+                }
+            },
+
+            onFileReceipt: function (transfer, data) {
+                try {
+                    var chatBoxView = this.getChatBoxViewFromBuddyJid(data.from),
+                        file = transfer.file;
+
+                    if (chatBoxView && file) {
+                        var message = __('File <span style="font-style: italic;">' + file.name + '</span> received.');
 
                         chatBoxView.showFiletransferNotification(message);
                     }
@@ -4015,8 +4041,7 @@
             this.chatboxviews = new this.ChatBoxViews({model: this.chatboxes});
             this.controlboxtoggle = new this.ControlBoxToggle();
             this.otr = new this.OTR();
-            this.peerTransfer = new PeerTransferHandler(Strophe.getBareJidFromJid(this.jid));
-            console.log('this.peerTransfer', this.peerTransfer);
+            this.peerTransferHandler = new PeerTransferHandler(Strophe.getBareJidFromJid(this.jid));
         };
 
         // Initialization
