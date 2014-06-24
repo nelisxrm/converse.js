@@ -4015,7 +4015,7 @@
             this.chatboxviews = new this.ChatBoxViews({model: this.chatboxes});
             this.controlboxtoggle = new this.ControlBoxToggle();
             this.otr = new this.OTR();
-            this.peerTransfer = new PeerTransfer(Strophe.getBareJidFromJid(this.jid));
+            this.peerTransfer = new PeerTransferHandler(Strophe.getBareJidFromJid(this.jid));
             console.log('this.peerTransfer', this.peerTransfer);
         };
 
