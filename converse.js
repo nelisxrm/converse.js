@@ -902,7 +902,8 @@
                 'mousedown .dragresize-tm': 'onDragResizeStart',
                 'click .toggle-filetransfer': 'toggleFiletransferMenu',
                 'click .toggle-filetransfer .validation': 'proposeFiletransfer',
-                'click .chat-filetransfer-accept': 'acceptFiletransfer'
+                'click .chat-filetransfer-accept': 'acceptFiletransfer',
+                'click .chat-filetransfer-refuse': 'refuseFiletransfer'
             },
 
             initialize: function (){
@@ -1334,7 +1335,7 @@
                 var remoteJid = Strophe.getBareJidFromJid(this.model.get('jid')),
                     data = {
                         type: 'proposal',
-                        fileSenderJid: Strophe.getBareJidFromJid(converse.connection.jid),
+                        from: Strophe.getBareJidFromJid(converse.connection.jid),
                         fileName: file.name,
                         fileSize: file.size,
                         fileType: file.type
@@ -1353,19 +1354,32 @@
             },
 
             acceptFiletransfer: function (ev) {
-                var fileSenderJid = Strophe.getBareJidFromJid(this.model.get('jid'));
+                var fileSenderJid = Strophe.getBareJidFromJid(this.model.get('jid')),
+                    approved = true;
 
                 ev.preventDefault();
                 ev.stopPropagation();
 
-                this.sendFileApproval(fileSenderJid);
+                this.sendProposalResponse(fileSenderJid, approved);
             },
 
-            sendFileApproval: function (fileSenderJid) {
+            refuseFiletransfer: function (ev) {
+                var fileSenderJid = Strophe.getBareJidFromJid(this.model.get('jid')),
+                    approved = false,
+                    message = __('Download cancelled.');
+
+                ev.preventDefault();
+                ev.stopPropagation();
+
+                this.sendProposalResponse(fileSenderJid, approved);
+                this.showFiletransferNotification(message);
+            },
+
+            sendProposalResponse: function (fileSenderJid, approved) {
                 var data = {
                     type: 'response',
-                    fileReceiverJid: Strophe.getBareJidFromJid(converse.connection.jid),
-                    approved: true
+                    from: Strophe.getBareJidFromJid(converse.connection.jid),
+                    approved: approved
                 };
 
                 converse.peerTransfer.send(fileSenderJid, data);
@@ -2525,7 +2539,7 @@
                     });
 
                     converse.peerTransfer.on('response', function (transfer, data) {
-                        if (data.approved) {
+                        if (data.approved === true) {
                             handler = self.onFileApproval.bind(self);
                         }
                         else {
@@ -2618,15 +2632,12 @@
 
             onFileProposal: function (transfer, data) {
                 try {
-                    var bareJid = Strophe.getBareJidFromJid(data.fileSenderJid),
-                        chatBox = this.getChatBoxFromBuddyJid(bareJid),
-                        chatBoxView = converse.chatboxviews.get(chatBox.id);
+                    var chatBoxView = this.getChatBoxViewFromBuddyJid(data.from);
 
-                    console.log('chatBox', chatBox);
                     console.log('chatBoxView', chatBoxView);
 
-                    if (chatBox) {
-                        var fullName = chatBox.get('fullname'),
+                    if (chatBoxView) {
+                        var fullName = chatBoxView.model.get('fullname'),
                             info = 'Size: ' + data.fileSize + 'b, Type: ' + data.fileType,
                             text = __(
                                 fullName + ' wants to send you the file ' +
@@ -2647,10 +2658,10 @@
 
             onFileApproval: function (transfer, data) {
                 try {
-                    var bareJid = Strophe.getBareJidFromJid(data.fileReceiverJid),
+                    var bareJid = Strophe.getBareJidFromJid(data.from),
                         data = {
                             type: 'file',
-                            fileSenderJid: Strophe.getBareJidFromJid(converse.connection.jid),
+                            from: Strophe.getBareJidFromJid(converse.connection.jid),
                             file: transfer.file
                         };
 
@@ -2662,24 +2673,31 @@
             },
 
             onFileRefusal: function (transfer, data) {
-                console.log('refused');
+                try {
+                    var chatBoxView = this.getChatBoxViewFromBuddyJid(data.from),
+                        file = transfer.file;
+
+                    if (chatBoxView && file) {
+                        var message = __('Download of <span style="font-style: italic;">' + file.name + '</span> cancelled.');
+
+                        chatBoxView.showFiletransferNotification(message);
+                    }
+                }
+                catch (e) {
+                    console.error(e);
+                }
             },
 
             onFileData: function (transfer, data) {
                 try {
-                var bareJid = Strophe.getBareJidFromJid(data.fileSenderJid),
-                    chatBox = this.getChatBoxFromBuddyJid(bareJid),
-                    chatBoxView = converse.chatboxviews.get(chatBox.id),
-                    file = data.file,
-                    intArray = new Uint8Array(file.data),
-                    blob = new Blob([intArray], {type: file.type}),
-                    url = window.URL.createObjectURL(blob);
+                    var chatBoxView = this.getChatBoxViewFromBuddyJid(data.from),
+                        file = data.file,
+                        intArray = new Uint8Array(file.data),
+                        blob = new Blob([intArray], {type: file.type}),
+                        url = window.URL.createObjectURL(blob);
 
-                    console.log('chatBox', chatBox);
-                    console.log('chatBoxView', chatBoxView);
-
-                    if (chatBox) {
-                        var message = '<a href="' + url + '" target="_blank" download="' + file.name + '">Download file.</a>';
+                    if (chatBoxView) {
+                        var message = __('<a href="' + url + '" target="_blank" download="' + file.name + '">Download file.</a>');
 
                         chatBoxView.showFiletransferNotification(message);
                     }
@@ -2690,11 +2708,12 @@
             },
 
             getChatBoxFromBuddyJid: function (buddyJid) {
+                debugger;
                 var chatBox = this.get(buddyJid);
 
                 if (!chatBox) {
                     var rosterItem = converse.roster.get(buddyJid),
-                        fullname;
+                        fullName;
 
                     if (typeof rosterItem === 'undefined') {
                         // The buddy was likely removed
@@ -2702,20 +2721,33 @@
                         return null;
                     }
 
-                    fullname = rosterItem.get('fullname');
-                    fullname = _.isEmpty(fullname) ? buddyJid : fullname;
+                    fullName = rosterItem.get('fullname');
+                    fullName = _.isEmpty(fullName) ? buddyJid : fullName;
 
                     chatBox = this.create({
                         'id': buddyJid,
                         'jid': buddyJid,
-                        'fullname': fullname,
+                        'fullname': fullName,
                         'image_type': rosterItem.get('image_type'),
                         'image': rosterItem.get('image'),
                         'url': rosterItem.get('url')
                     });
                 }
 
+                console.log('chatBox', chatBox);
+
                 return chatBox;
+            },
+
+            getChatBoxViewFromBuddyJid: function (buddyJid) {
+                var bareJid = Strophe.getBareJidFromJid(buddyJid),
+                    chatBox = this.getChatBoxFromBuddyJid(bareJid);
+                    console.log('chatBox', chatBox);
+                var chatBoxView = converse.chatboxviews.get(chatBox.id);
+
+                console.log('chatBoxView', chatBoxView);
+
+                return chatBoxView;
             }
         });
 
