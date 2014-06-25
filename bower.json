@@ -29,7 +29,8 @@
     "jquery.browser": "~0.0.6",
     "backbone.overview": "*",
     "peerjs": "~0.3.8",
-    "peer-transfer": "git@github.com:g8g3/peer-transfer.git"
+    "peer-transfer": "git@github.com:g8g3/peer-transfer.git",
+    "html5-desktop-notifications": "*"
   },
   "exportsOverride": {}
 }

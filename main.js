@@ -36,7 +36,8 @@ config = {
         "otr": "components/otr/build/otr",
         "peer": "components/peerjs/peer",
         "peer-transfer": "components/peer-transfer/peer-transfer",
-        "converse-dependencies": "src/deps-peer"
+        "notify": "components/html5-desktop-notifications/desktop-notify",
+        "converse-dependencies": "src/deps-integration"
     },
 
     tpl: {

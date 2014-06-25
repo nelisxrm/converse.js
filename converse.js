@@ -2640,6 +2640,7 @@
                 }
 
                 chatbox.receiveMessage($message);
+                try{converse.showDesktopNotification(chatbox.get('fullname'), message);}catch(e){console.error(e);}
                 converse.roster.addResource(buddy_jid, resource);
                 converse.emit('onMessage', message);
                 return true;
@@ -4062,6 +4063,37 @@
         this.registerGlobalEventHandlers();
         converse.emit('onInitialized');
     };
+
+    converse.showDesktopNotification = function (contactFullName, message) {
+        if (!notify.isSupported) {
+            return;
+        }
+
+        var notificationPermission = notify.permissionLevel();
+
+        console.log('notification permission', notificationPermission);
+
+        switch (notificationPermission) {
+            case notify.PERMISSION_DEFAULT:
+                notify.requestPermission();
+                break;
+
+            case notify.PERMISSION_GRANTED:
+                var title = 'Message from ' + contactFullName;
+
+                console.log('notifying', title, notify);
+
+                notify.createNotification(title, {
+                    body: message,
+                    icon: 'web/asset/images/logo-new-color.png'
+                });
+                break;
+
+            case notify.PERMISSION_DENIED:
+                break;
+        }
+    };
+
     return {
         'initialize': function (settings, callback) {
             converse.initialize(settings, callback);
