@@ -38,6 +38,7 @@ config = {
         "peer-transfer": "components/peer-transfer/peer-transfer",
         "notify": "components/html5-desktop-notifications/desktop-notify",
         "filesize": "components/filesize/lib/filesize",
+        "visibility": "components/visibilityjs/lib/visibility.core",
         "converse-dependencies": "src/deps-integration"
     },
 

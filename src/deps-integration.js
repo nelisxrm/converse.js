@@ -13,7 +13,8 @@ define("converse-dependencies", [
     "strophe.vcard",
     "strophe.disco",
     "peer-transfer",
-    "notify"
+    "notify",
+    "visibility"
 ], function(otr, moment, filesize) {
     return {
         'otr': otr,

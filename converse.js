@@ -117,10 +117,21 @@
                 conversejs.style.display = 'block';
             }
         },
+        showDesktopNotificationIfNoFocus: function (title, message) {
+            console.log('visibility state', Visibility.state());
+
+            var isPageHidden = Visibility.isSupported()
+                ? Visibility.hidden()
+                : !document.hasFocus();
+
+            if (isPageHidden) {
+                converse.showDesktopNotification(title, message);
+            }
+        },
         showDesktopNotification: function (title, message) {
             try {
                 if (!notify.isSupported) {
-                    converse.log('desktop notification are not supported', notificationPermission);
+                    converse.log('desktop notifications are not supported', notificationPermission);
                     return;
                 }
 
@@ -894,7 +905,7 @@
                         message: body
                     });
 
-                    converse.showDesktopNotification(
+                    converse.showDesktopNotificationIfNoFocus(
                         notificationTitle,
                         converse.truncateText(body, 30)
                     );
@@ -2713,7 +2724,7 @@
                             refuseLabel = __('Refuse');
 
                         chatBoxView.showFileProposalNotification(text, acceptLabel, refuseLabel);
-                        converse.showDesktopNotification(
+                        converse.showDesktopNotificationIfNoFocus(
                             fullName + ' wants to send you a file',
                             'File: "' + data.fileName + '", type: "' + data.fileType + '", size: ' + filesize(data.fileSize)
                         );
