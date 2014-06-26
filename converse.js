@@ -14,11 +14,12 @@
             function(dependencies, templates) {
                 console.log('dependencies', dependencies);
                 var otr = dependencies.otr,
-                    moment = dependencies.moment;
+                    moment = dependencies.moment,
+                    filesize = dependencies.filesize;
                 if (typeof otr !== "undefined") {
-                    return factory(jQuery, _, otr.OTR, otr.DSA, templates, moment);
+                    return factory(jQuery, _, otr.OTR, otr.DSA, templates, moment, filesize);
                 } else {
-                    return factory(jQuery, _, undefined, undefined, templates, moment);
+                    return factory(jQuery, _, undefined, undefined, templates, moment, filesize);
                 }
             }
         );
@@ -32,7 +33,7 @@
         // TODO Templates not defined
         root.converse = factory(jQuery, _, OTR, DSA, templates);
     }
-}(this, function ($, _, OTR, DSA, templates, moment) {
+}(this, function ($, _, OTR, DSA, templates, moment, filesize) {
     "use strict";
     if (typeof console === "undefined" || typeof console.log === "undefined") {
         console = { log: function () {}, error: function () {} };
@@ -1179,7 +1180,7 @@
 
             keyPressed: function (ev) {
                 var $textarea = $(ev.target),
-                    message, notify, composing;
+                    message, notification, composing;
                 if(ev.keyCode == KEY.ENTER) {
                     ev.preventDefault();
                     message = $textarea.val();
@@ -1200,9 +1201,9 @@
                         if (ev.keyCode != 47) {
                             // We don't send composing messages if the message
                             // starts with forward-slash.
-                            notify = $msg({'to':this.model.get('jid'), 'type': 'chat'})
+                            notification = $msg({'to':this.model.get('jid'), 'type': 'chat'})
                                             .c('composing', {'xmlns':'http://jabber.org/protocol/chatstates'});
-                            converse.connection.send(notify);
+                            converse.connection.send(notification);
                         }
                         this.$el.data('composing', true);
                     }
@@ -2712,12 +2713,10 @@
                             refuseLabel = __('Refuse');
 
                         chatBoxView.showFileProposalNotification(text, acceptLabel, refuseLabel);
-                        /*
                         converse.showDesktopNotification(
-                            fullName + 'want to send you a file',
-                            'File: "' + data.fileName + '", size: '
+                            fullName + ' wants to send you a file',
+                            'File: "' + data.fileName + '", type: "' + data.fileType + '", size: ' + filesize(data.fileSize)
                         );
-*/
                     }
                 }
                 catch (e) {

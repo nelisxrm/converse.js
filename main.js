@@ -37,6 +37,7 @@ config = {
         "peer": "components/peerjs/peer",
         "peer-transfer": "components/peer-transfer/peer-transfer",
         "notify": "components/html5-desktop-notifications/desktop-notify",
+        "filesize": "components/filesize/lib/filesize",
         "converse-dependencies": "src/deps-integration"
     },
 

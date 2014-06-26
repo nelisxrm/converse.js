@@ -1,6 +1,7 @@
 define("converse-dependencies", [
     "otr",
     "moment",
+    "filesize",
     "locales",
     "backbone.localStorage",
     "backbone.overview",
@@ -13,9 +14,10 @@ define("converse-dependencies", [
     "strophe.disco",
     "peer-transfer",
     "notify"
-], function(otr, moment) {
+], function(otr, moment, filesize) {
     return {
         'otr': otr,
-        'moment': moment
+        'moment': moment,
+        'filesize': filesize
     };
 });
