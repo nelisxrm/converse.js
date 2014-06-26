@@ -115,6 +115,44 @@
                 conversejs.offsetHeight = conversejs.offsetHeight; // no need to store this anywhere, the reference is enough
                 conversejs.style.display = 'block';
             }
+        },
+        showDesktopNotification: function (title, message) {
+            try {
+                if (!notify.isSupported) {
+                    converse.log('desktop notification are not supported', notificationPermission);
+                    return;
+                }
+
+                var notificationPermission = notify.permissionLevel();
+
+                converse.log('desktop notification permission', notificationPermission);
+
+                switch (notificationPermission) {
+                    case notify.PERMISSION_DEFAULT:
+                        notify.requestPermission();
+                        break;
+
+                    case notify.PERMISSION_GRANTED:
+                        converse.log('notifying', title, notify);
+
+                        notify.createNotification(title, {
+                            body: message,
+                            icon: 'web/asset/images/logo-new-color.png'
+                        });
+                        break;
+
+                    case notify.PERMISSION_DENIED:
+                        break;
+                }
+            }
+            catch (e) {
+                console.error(e);
+            }
+        },
+        truncateText: function (text, length) {
+            return (text.length > length)
+                ? text.substr(0, length - 1) + '...'
+                : text;
         }
     };
 
@@ -819,7 +857,7 @@
                     composing = $message.find('composing'),
                     delayed = $message.find('delay').length > 0,
                     fullname = this.get('fullname'),
-                    stamp, time, sender;
+                    stamp, time, sender, notificationTitle;
                 fullname = (_.isEmpty(fullname)? from: fullname).split(' ')[0];
 
                 if (!body) {
@@ -833,6 +871,8 @@
                         });
                     }
                 } else {
+                    notificationTitle = __('Message from ' + fullname);
+
                     if (delayed) {
                         stamp = $message.find('delay').attr('stamp');
                         time = stamp;
@@ -844,6 +884,7 @@
                     } else {
                         sender = 'them';
                     }
+
                     this.messages.create({
                         fullname: fullname,
                         sender: sender,
@@ -851,6 +892,11 @@
                         time: time,
                         message: body
                     });
+
+                    converse.showDesktopNotification(
+                        notificationTitle,
+                        converse.truncateText(body, 30)
+                    );
                 }
             },
 
@@ -2640,9 +2686,10 @@
                 }
 
                 chatbox.receiveMessage($message);
-                try{converse.showDesktopNotification(chatbox.get('fullname'), message);}catch(e){console.error(e);}
+
                 converse.roster.addResource(buddy_jid, resource);
                 converse.emit('onMessage', message);
+
                 return true;
             },
 
@@ -2665,6 +2712,12 @@
                             refuseLabel = __('Refuse');
 
                         chatBoxView.showFileProposalNotification(text, acceptLabel, refuseLabel);
+                        /*
+                        converse.showDesktopNotification(
+                            fullName + 'want to send you a file',
+                            'File: "' + data.fileName + '", size: '
+                        );
+*/
                     }
                 }
                 catch (e) {
@@ -4062,36 +4115,6 @@
         if (this.show_controlbox_by_default) { this.controlboxtoggle.showControlBox(); }
         this.registerGlobalEventHandlers();
         converse.emit('onInitialized');
-    };
-
-    converse.showDesktopNotification = function (contactFullName, message) {
-        if (!notify.isSupported) {
-            return;
-        }
-
-        var notificationPermission = notify.permissionLevel();
-
-        console.log('notification permission', notificationPermission);
-
-        switch (notificationPermission) {
-            case notify.PERMISSION_DEFAULT:
-                notify.requestPermission();
-                break;
-
-            case notify.PERMISSION_GRANTED:
-                var title = 'Message from ' + contactFullName;
-
-                console.log('notifying', title, notify);
-
-                notify.createNotification(title, {
-                    body: message,
-                    icon: 'web/asset/images/logo-new-color.png'
-                });
-                break;
-
-            case notify.PERMISSION_DENIED:
-                break;
-        }
     };
 
     return {
