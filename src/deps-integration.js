@@ -14,7 +14,8 @@ define("converse-dependencies", [
     "strophe.disco",
     "peer-transfer",
     "notify",
-    "visibility"
+    "visibility",
+    "sound"
 ], function(otr, moment, filesize) {
     return {
         'otr': otr,

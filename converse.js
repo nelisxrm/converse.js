@@ -117,27 +117,43 @@
                 conversejs.style.display = 'block';
             }
         },
-        showDesktopNotificationIfNoFocus: function (title, message) {
-            console.log('visibility state', Visibility.state());
+        notifyIfNotFocused: function (title, message) {
+            try {
+                var isPageNotFocused = Visibility.isSupported()
+                    ? Visibility.hidden()
+                    : !document.hasFocus();
 
-            var isPageHidden = Visibility.isSupported()
-                ? Visibility.hidden()
-                : !document.hasFocus();
+                console.log('is page not focused?', isPageNotFocused);
 
-            if (isPageHidden) {
-                converse.showDesktopNotification(title, message);
+                if (isPageNotFocused) {
+                    converse.showDesktopNotification(title, message);
+                    converse.playSoundNotification();
+                }
+            }
+            catch (e) {
+                console.error(e);
+            }
+        },
+        playSoundNotification: function () {
+            try {
+                var sound = createjs.Sound.play('notification');
+
+                console.log('sound', sound);
+            }
+            catch (e) {
+                console.error(e);
             }
         },
         showDesktopNotification: function (title, message) {
             try {
                 if (!notify.isSupported) {
-                    converse.log('desktop notifications are not supported', notificationPermission);
+                    console.log('desktop notifications are not supported', notificationPermission);
                     return;
                 }
 
                 var notificationPermission = notify.permissionLevel();
 
-                converse.log('desktop notification permission', notificationPermission);
+                console.log('desktop notification permission', notificationPermission);
 
                 switch (notificationPermission) {
                     case notify.PERMISSION_DEFAULT:
@@ -145,7 +161,7 @@
                         break;
 
                     case notify.PERMISSION_GRANTED:
-                        converse.log('notifying', title, notify);
+                        console.log('notifying', title, notify);
 
                         notify.createNotification(title, {
                             body: message,
@@ -594,6 +610,7 @@
                 this.registerPresenceHandler();
                 this.chatboxes.registerMessageHandler();
                 this.chatboxes.registerPeerTransferHandler();
+                this.chatboxes.registerSoundNotification();
                 converse.xmppstatus.sendPresence();
                 this.giveFeedback(__('Online Contacts'));
             }, this));
@@ -905,7 +922,7 @@
                         message: body
                     });
 
-                    converse.showDesktopNotificationIfNoFocus(
+                    converse.notifyIfNotFocused(
                         notificationTitle,
                         converse.truncateText(body, 30)
                     );
@@ -2636,6 +2653,15 @@
                 }
             },
 
+            registerSoundNotification: function () {
+                var filePathWithoutExtension = 'web/vendor/converse/src/sound/notification';
+
+                createjs.Sound.registerSound({
+                    src: filePathWithoutExtension + '.mp3|' + filePathWithoutExtension + '.ogg',
+                    id: 'notification'
+                });
+            },
+
             onConnected: function () {
                 this.localStorage = new Backbone.LocalStorage(
                     b64_sha1('converse.chatboxes-'+converse.bare_jid));
@@ -2651,6 +2677,7 @@
                 this.get('controlbox').set({connected:true});
                 this.registerMessageHandler();
                 this.registerPeerTransferHandler();
+                this.registerSoundNotification();
                 // Get cached chatboxes from localstorage
                 this.fetch({
                     add: true,
@@ -2724,7 +2751,7 @@
                             refuseLabel = __('Refuse');
 
                         chatBoxView.showFileProposalNotification(text, acceptLabel, refuseLabel);
-                        converse.showDesktopNotificationIfNoFocus(
+                        converse.notifyIfNotFocused(
                             fullName + ' wants to send you a file',
                             'File: "' + data.fileName + '", type: "' + data.fileType + '", size: ' + filesize(data.fileSize)
                         );
@@ -4105,7 +4132,13 @@
             this.chatboxviews = new this.ChatBoxViews({model: this.chatboxes});
             this.controlboxtoggle = new this.ControlBoxToggle();
             this.otr = new this.OTR();
-            this.peerTransferHandler = new PeerTransferHandler(Strophe.getBareJidFromJid(this.jid));
+
+            try {
+                this.peerTransferHandler = new PeerTransferHandler(Strophe.getBareJidFromJid(this.jid));
+            }
+            catch (e) {
+                this.peerTransferHandler = null;
+            }
         };
 
         // Initialization

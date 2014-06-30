@@ -39,6 +39,7 @@ config = {
         "notify": "components/html5-desktop-notifications/desktop-notify",
         "filesize": "components/filesize/lib/filesize",
         "visibility": "components/visibilityjs/lib/visibility.core",
+        "sound": "components/SoundJS/lib/soundjs-0.5.2.min",
         "converse-dependencies": "src/deps-integration"
     },
 
