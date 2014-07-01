@@ -2803,29 +2803,122 @@
             },
 
             onFileData: function (transfer, data) {
-                try {
-                    var bareJid = Strophe.getBareJidFromJid(data.from),
-                        chatBoxView = this.getChatBoxViewFromBuddyJid(data.from),
-                        file = data.file,
-                        intArray = new Uint8Array(file.data),
-                        blob = new Blob([intArray], {type: file.type}),
-                        url = window.URL.createObjectURL(blob),
+                var bareJid, chatBoxView, file, blob, url, dataToSend,
+                    self = this;
+
+                function prepareDownload () {
+                    file = data.file;
+                    file.id = (new Date).getTime();
+
+                    console.log('file id', file.id);
+
+                    chatBoxView.showFiletransferNotification(
+                        '<div class="chat-filetransfer-progress_' + file.id + '"></div>'
+                    );
+                }
+
+                function performDownload () {
+                    self.getDownloadUrl(file, function (url) {
                         dataToSend = {
                             type: 'receipt',
                             from: Strophe.getBareJidFromJid(converse.connection.jid)
                         };
 
+                        chatBoxView.showFiletransferNotification(
+                            '<div><a href="' + url + '" target="_blank" download="' + file.name + '">Click to <span style="font-style: italic;">' + file.name + '</span> to your files.</a></div>'
+                        );
+
+                        converse.peerTransferHandler.send(bareJid, dataToSend);
+                    });
+                }
+
+                try {
+                    bareJid = Strophe.getBareJidFromJid(data.from);
+                    chatBoxView = this.getChatBoxViewFromBuddyJid(data.from);
+
                     if (chatBoxView) {
-                        var message = __('<a href="' + url + '" target="_blank" download="' + file.name + '">Download file.</a>');
-
-                        chatBoxView.showFiletransferNotification(message);
+                        prepareDownload();
+                        performDownload();
                     }
-
-                    converse.peerTransferHandler.send(bareJid, dataToSend);
                 }
                 catch (e) {
                     console.error(e);
                 }
+            },
+
+            getDownloadUrl: function (file, callback) {
+                if (!file || typeof callback !== 'function') {
+                    return null;
+                }
+
+                this.createBlob(file, this.showProgress, function (blob) {
+                    var url = window.URL.createObjectURL(blob);
+
+                    callback(url);
+                });
+            },
+
+            createBlob: function (file, progressCallback, resultCallback) {
+                if (!file || typeof resultCallback !== 'function') {
+                    return null;
+                }
+
+                var startTime = new Date,
+                    duration = null,
+                    fileSize = file.size || 0,
+                    fileMime = file.mime,
+                    chunksQuantity = 100,
+                    chunkSize = Math.ceil(fileSize / chunksQuantity),
+                    doneChunksSize = 0,
+                    chunkBlobs = [],
+                    finalBlob = null,
+                    i = 0;
+
+                function createChunks() {
+                    var currentChunkSize = Math.min(fileSize - doneChunksSize, chunkSize),
+                        typedArray = new Uint8Array(file.data, doneChunksSize, currentChunkSize);
+
+                    chunkBlobs[i] = new Blob([typedArray], {type: fileMime});
+                    doneChunksSize += currentChunkSize;
+
+                    console.log('chunk', i, 'done', doneChunksSize, 'on', fileSize);
+
+                    if (doneChunksSize < fileSize) {
+                        i++;
+
+                        setTimeout(createChunks, 0);
+                    }
+
+                    if (typeof progressCallback === 'function') {
+                        progressCallback(file, doneChunksSize);
+                    }
+                }
+
+                function createBlobWithChunks() {
+                    if (doneChunksSize === fileSize) {
+                        console.log('all chunks done');
+                            finalBlob = new Blob(chunkBlobs, {type: fileMime});
+
+                            duration = (new Date) - startTime;
+
+                            console.info('blob creation duration (ms)', duration);
+
+                            resultCallback(finalBlob);
+                    }
+                    else {
+                        setTimeout(createBlobWithChunks, 10);
+                    }
+                }
+
+                createChunks();
+                createBlobWithChunks();
+
+            },
+
+            showProgress: function (file, doneSize) {
+                var id = file.id,
+                    fileSize = file.size;
+                $('.chat-filetransfer-progress_' + id).text(doneSize + '/' + fileSize);
             },
 
             onFileReceipt: function (transfer, data) {
