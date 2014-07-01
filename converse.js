@@ -2818,18 +2818,18 @@
                 }
 
                 function performDownload () {
-                    self.getDownloadUrl(file, function (url) {
-                        dataToSend = {
-                            type: 'receipt',
-                            from: Strophe.getBareJidFromJid(converse.connection.jid)
-                        };
+                    var url = self.getDownloadUrl(file);
 
-                        chatBoxView.showFiletransferNotification(
-                            '<div><a href="' + url + '" target="_blank" download="' + file.name + '">Click to <span style="font-style: italic;">' + file.name + '</span> to your files.</a></div>'
-                        );
+                    dataToSend = {
+                        type: 'receipt',
+                        from: Strophe.getBareJidFromJid(converse.connection.jid)
+                    };
 
-                        converse.peerTransferHandler.send(bareJid, dataToSend);
-                    });
+                    chatBoxView.showFiletransferNotification(
+                        '<div><a href="' + url + '" target="_blank" download="' + file.name + '">Click to save <span style="font-style: italic;">' + file.name + '</span> to your files.</a></div>'
+                    );
+
+                    converse.peerTransferHandler.send(bareJid, dataToSend);
                 }
 
                 try {
@@ -2846,79 +2846,34 @@
                 }
             },
 
-            getDownloadUrl: function (file, callback) {
-                if (!file || typeof callback !== 'function') {
+            getDownloadUrl: function (file) {
+                if (!file) {
                     return null;
                 }
 
-                this.createBlob(file, this.showProgress, function (blob) {
-                    var url = window.URL.createObjectURL(blob);
+                var blob = this.createBlob(file),
+                    url = window.URL.createObjectURL(blob);
 
-                    callback(url);
-                });
+                return url;
             },
 
-            createBlob: function (file, progressCallback, resultCallback) {
-                if (!file || typeof resultCallback !== 'function') {
+            createBlob: function (file) {
+                if (!file) {
                     return null;
                 }
 
-                var startTime = new Date,
-                    duration = null,
-                    fileSize = file.size || 0,
-                    fileMime = file.mime,
-                    chunksQuantity = 100,
-                    chunkSize = Math.ceil(fileSize / chunksQuantity),
-                    doneChunksSize = 0,
-                    chunkBlobs = [],
-                    finalBlob = null,
-                    i = 0;
+                var typedArray = new Uint8Array(file.data),
+                    blob = new Blob([typedArray], {type: file.type});
 
-                function createChunks() {
-                    var currentChunkSize = Math.min(fileSize - doneChunksSize, chunkSize),
-                        typedArray = new Uint8Array(file.data, doneChunksSize, currentChunkSize);
-
-                    chunkBlobs[i] = new Blob([typedArray], {type: fileMime});
-                    doneChunksSize += currentChunkSize;
-
-                    console.log('chunk', i, 'done', doneChunksSize, 'on', fileSize);
-
-                    if (doneChunksSize < fileSize) {
-                        i++;
-
-                        setTimeout(createChunks, 0);
-                    }
-
-                    if (typeof progressCallback === 'function') {
-                        progressCallback(file, doneChunksSize);
-                    }
-                }
-
-                function createBlobWithChunks() {
-                    if (doneChunksSize === fileSize) {
-                        console.log('all chunks done');
-                            finalBlob = new Blob(chunkBlobs, {type: fileMime});
-
-                            duration = (new Date) - startTime;
-
-                            console.info('blob creation duration (ms)', duration);
-
-                            resultCallback(finalBlob);
-                    }
-                    else {
-                        setTimeout(createBlobWithChunks, 10);
-                    }
-                }
-
-                createChunks();
-                createBlobWithChunks();
-
+                return blob;
             },
 
             showProgress: function (file, doneSize) {
                 var id = file.id,
-                    fileSize = file.size;
-                $('.chat-filetransfer-progress_' + id).text(doneSize + '/' + fileSize);
+                    fileText = filesize(file.size),
+                    doneText = filesize(doneSize);
+
+                $('.chat-filetransfer-progress_' + id).text(doneText + '/' + fileText);
             },
 
             onFileReceipt: function (transfer, data) {
