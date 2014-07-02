@@ -1435,7 +1435,7 @@
                 });
 
                 message = __(
-                    'Waiting for %1$s to accept file \"%2$s\".'
+                    'Waiting for %1$s to accept file "%2$s".',
                     [fileReceiverFullName, file.name]
                 );
 
@@ -2796,7 +2796,7 @@
 
                     if (chatBoxView && file) {
                         var message = __(
-                            'Transfer of "%1$s" cancelled.',
+                            'Transfer of \"%1$s\" cancelled.',
                             [file.name]
                         );
 
@@ -4193,7 +4193,7 @@
             this.otr = new this.OTR();
 
             try {
-                this.peerTransferHandler = new PeerTransferHandler(Strophe.getBareJidFromJid(this.jid));
+                this.peerTransferHandler = new PeerTransferHandler(Strophe.getBareJidFromJid(this.jid), {debug: true});
             }
             catch (e) {
                 this.peerTransferHandler = null;
