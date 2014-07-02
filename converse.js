@@ -1434,7 +1434,10 @@
                     console.log('attached transfer', transfer);
                 });
 
-                message = __('Waiting for ' + fileReceiverFullName + ' to accept <span style="font-style: italic;">' + file.name + '</span>.');
+                message = __(
+                    'Waiting for %1$s to accept file "%2$s".'
+                    [fileReceiverFullName, file.name]
+                );
 
                 this.toggleFiletransferMenu();
                 this.showFiletransferNotification(message);
@@ -2739,21 +2742,18 @@
                     console.log('chatBoxView', chatBoxView);
 
                     if (chatBoxView) {
-                        var fullName = chatBoxView.model.get('fullname'),
-                            info = 'Size: ' + data.fileSize + 'b, Type: ' + data.fileType,
-                            text = __(
-                                fullName + ' wants to send you the file ' +
-                                '<span style="font-style:italic;" title="' + info + '">' +
-                                data.fileName +
-                                '</span>.'
-                            ),
-                            acceptLabel = __('Accept'),
-                            refuseLabel = __('Refuse');
+                        var contactName = chatBoxView.model.get('fullname'),
+                            fileName = data.fileName,
+                            info = filesize(data.fileSize) + ', ' + data.fileType;
 
-                        chatBoxView.showFileProposalNotification(text, acceptLabel, refuseLabel);
+                        chatBoxView.showFileProposalNotification(
+                            __('%1$s wants to send file "%2$s" (%3$s).', [contactName, fileName, info]),
+                            __('Accept'),
+                            __('Refuse')
+                        );
                         converse.notifyIfNotFocused(
-                            fullName + ' wants to send you a file',
-                            'File: "' + data.fileName + '", type: "' + data.fileType + '", size: ' + filesize(data.fileSize)
+                            __('%1$s wants to send you a file', [contactName]),
+                            __('"%1$s" (%2$s)', [fileName, info])
                         );
                     }
                 }
@@ -2774,7 +2774,10 @@
                         chatBoxView = this.getChatBoxViewFromBuddyJid(data.from);
 
                     if (chatBoxView && file) {
-                        var message = __('File <span style="font-style: italic;">' + file.name + '</span> accepted.');
+                        var message = __(
+                            'File "%1$s" accepted.',
+                            [file.name]
+                        );
 
                         chatBoxView.showFiletransferNotification(message);
                     }
@@ -2792,7 +2795,10 @@
                         file = transfer.file;
 
                     if (chatBoxView && file) {
-                        var message = __('Download of <span style="font-style: italic;">' + file.name + '</span> cancelled.');
+                        var message = __(
+                            'Download of "%1$s" cancelled.',
+                            [file.name]
+                        );
 
                         chatBoxView.showFiletransferNotification(message);
                     }
@@ -2818,16 +2824,18 @@
                 }
 
                 function performDownload () {
-                    var url = self.getDownloadUrl(file);
+                    var url = self.getDownloadUrl(file),
+                        notificationHtml =
+                            '<div><a href="' + url + '" target="_blank" download="' + file.name + '"></a>' +
+                            __('Click to save "%1$s" to your files.', [file.name]) +
+                            '</div>';
 
                     dataToSend = {
                         type: 'receipt',
                         from: Strophe.getBareJidFromJid(converse.connection.jid)
                     };
 
-                    chatBoxView.showFiletransferNotification(
-                        '<div><a href="' + url + '" target="_blank" download="' + file.name + '">Click to save <span style="font-style: italic;">' + file.name + '</span> to your files.</a></div>'
-                    );
+                    chatBoxView.showFiletransferNotification(notificationHtml);
 
                     converse.peerTransferHandler.send(bareJid, dataToSend);
                 }
@@ -2882,7 +2890,10 @@
                         file = transfer.file;
 
                     if (chatBoxView && file) {
-                        var message = __('File <span style="font-style: italic;">' + file.name + '</span> received.');
+                        var message = __(
+                            'File "%1$s" received.',
+                            [file.name]
+                        );
 
                         chatBoxView.showFiletransferNotification(message);
                     }
