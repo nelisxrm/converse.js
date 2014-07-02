@@ -1435,7 +1435,7 @@
                 });
 
                 message = __(
-                    'Waiting for %1$s to accept file "%2$s".'
+                    'Waiting for %1$s to accept file \"%2$s\".'
                     [fileReceiverFullName, file.name]
                 );
 
@@ -1456,7 +1456,7 @@
             refuseFiletransfer: function (ev) {
                 var fileSenderJid = Strophe.getBareJidFromJid(this.model.get('jid')),
                     approved = false,
-                    message = __('Download cancelled.');
+                    message = __('Transfer cancelled.');
 
                 ev.preventDefault();
                 ev.stopPropagation();
@@ -2796,7 +2796,7 @@
 
                     if (chatBoxView && file) {
                         var message = __(
-                            'Download of "%1$s" cancelled.',
+                            'Transfer of "%1$s" cancelled.',
                             [file.name]
                         );
 
@@ -2826,9 +2826,9 @@
                 function performDownload () {
                     var url = self.getDownloadUrl(file),
                         notificationHtml =
-                            '<div><a href="' + url + '" target="_blank" download="' + file.name + '"></a>' +
+                            '<div><a href="' + url + '" target="_blank" download="' + file.name + '">' +
                             __('Click to save "%1$s" to your files.', [file.name]) +
-                            '</div>';
+                            '</a></div>';
 
                     dataToSend = {
                         type: 'receipt',
