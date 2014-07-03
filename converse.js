@@ -900,7 +900,7 @@
                         });
                     }
                 } else {
-                    notificationTitle = __('Message from ' + fullname);
+                    notificationTitle = __('Message from %1$s', [fullname]);
 
                     if (delayed) {
                         stamp = $message.find('delay').attr('stamp');
