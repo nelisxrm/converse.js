@@ -1,5 +1,5 @@
 {[ if (show_emoticons)  { ]}
-    <li class="toggle-smiley icon-happy" title="Insert a smilery">
+    <li class="toggle-smiley icon-happy" title="{{smiley_button_title}}">
         <ul>
             <li><a class="icon-smiley" href="#" data-emoticon=":)"></a></li>
             <li><a class="icon-wink" href="#" data-emoticon=";)"></a></li>
@@ -18,10 +18,10 @@
     </li>
 {[ } ]}
 {[ if (allow_filetransfer)  { ]}
-    <li class="toggle-filetransfer icon-attachment" title="Send a file">
+    <li class="toggle-filetransfer icon-attachment" title="{{filetransfer_button_title}}">
         <ul>
             <li><input type="file" class="file"/></li>
-            <li><button class="validation">Send</button></li>
+            <li><button class="validation">{{filetransfer_send_button}}</button></li>
         </ul>
     </li>
 {[ } ]}
@@ -29,7 +29,7 @@
     <li class="toggle-call"><a class="icon-phone" title="Start a call"></a></li>
 {[ } ]}
 {[ if (show_clear_button)  { ]}
-    <li class="toggle-clear"><a class="icon-remove" title="Clear all messages"></a></li>
+    <li class="toggle-clear"><a class="icon-remove" title="{{clear_button_title}}"></a></li>
 {[ } ]}
 {[ if (allow_otr)  { ]}
     <li class="toggle-otr {{otr_status_class}}" title="{{otr_tooltip}}">

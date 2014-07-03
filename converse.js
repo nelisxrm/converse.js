@@ -1640,7 +1640,11 @@
                                 otr_translated_status: OTR_TRANSLATED_MAPPING[data.otr_status],
                                 show_call_button: converse.visible_toolbar_buttons.call,
                                 show_clear_button: converse.visible_toolbar_buttons.clear,
-                                show_emoticons: converse.visible_toolbar_buttons.emoticons
+                                show_emoticons: converse.visible_toolbar_buttons.emoticons,
+                                smiley_button_title: __('Insert a smiley'),
+                                filetransfer_button_title: __('Transfer a file'),
+                                filetransfer_send_button: __('Send'),
+                                clear_button_title: __('Clear all messages')
                             })
                         )
                     );
