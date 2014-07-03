@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Converse.js 0.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-03 12:40+0200\n"
+"POT-Creation-Date: 2014-07-03 14:16+0200\n"
 "PO-Revision-Date: 2013-09-15 21:58+0200\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
@@ -147,7 +147,6 @@ msgid "me"
 msgstr ""
 
 #: converse.js:1154
-#, fuzzy
 msgid "%1$s is typing"
 msgstr "%1$s est en train d'écrire"
 
@@ -755,11 +754,14 @@ msgstr "S'inscrire"
 msgid "Toggle chat"
 msgstr ""
 
-#~ msgid "BOSH Service URL:"
-#~ msgstr "URL du service BOSH:"
+msgid "offline"
+msgstr "déconnecté"
 
-#~ msgid "Connected"
-#~ msgstr "Connecté"
+msgid "BOSH Service URL:"
+msgstr "URL du service BOSH:"
 
-#~ msgid "Attached"
-#~ msgstr "Attaché"
+msgid "Connected"
+msgstr "Connecté"
+
+msgid "Attached"
+msgstr "Attaché"

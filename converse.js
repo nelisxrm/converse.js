@@ -1508,11 +1508,11 @@
                     fullname = _.isEmpty(fullname)? item.get('jid'): fullname;
                     if (this.$el.is(':visible')) {
                         if (chat_status === 'offline') {
-                            this.showStatusNotification(__('%1$s has gone offline', [fullname]);
+                            this.showStatusNotification(__('%1$s has gone offline', [fullname]));
                         } else if (chat_status === 'away') {
-                            this.showStatusNotification(__('%1$s has gone away', [fullname]);
+                            this.showStatusNotification(__('%1$s has gone away', [fullname]));
                         } else if ((chat_status === 'dnd')) {
-                            this.showStatusNotification(__('%1$s is busy', [fullname]);
+                            this.showStatusNotification(__('%1$s is busy', [fullname]));
                         } else if (chat_status === 'online') {
                             this.$el.find('div.chat-event').remove();
                         }
