@@ -1151,7 +1151,7 @@
                     }
                 }
                 if (message.get('composing')) {
-                    this.showStatusNotification(message.get('fullname')+' '+'is typing');
+                    this.showStatusNotification(__('%1$s is typing', [message.get('fullname')]));
                     return;
                 } else {
                     this.showMessage(_.clone(message.attributes));
@@ -1508,11 +1508,11 @@
                     fullname = _.isEmpty(fullname)? item.get('jid'): fullname;
                     if (this.$el.is(':visible')) {
                         if (chat_status === 'offline') {
-                            this.showStatusNotification(fullname+' '+'has gone offline');
+                            this.showStatusNotification(__('%1$s has gone offline', [fullname]);
                         } else if (chat_status === 'away') {
-                            this.showStatusNotification(fullname+' '+'has gone away');
+                            this.showStatusNotification(__('%1$s has gone away', [fullname]);
                         } else if ((chat_status === 'dnd')) {
-                            this.showStatusNotification(fullname+' '+'is busy');
+                            this.showStatusNotification(__('%1$s is busy', [fullname]);
                         } else if (chat_status === 'online') {
                             this.$el.find('div.chat-event').remove();
                         }
