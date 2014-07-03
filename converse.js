@@ -1039,28 +1039,45 @@
 
             showStatusNotification: function (message, replace) {
                 var $chat_content = this.$el.find('.chat-content');
+
                 $chat_content.find('div.chat-event').remove().end()
                     .append($('<div class="chat-event"></div>').text(message));
                 this.scrollDown();
             },
 
-            showFileProposalNotification: function (message, acceptLabel, refuseLabel) {
-                var acceptLink = '<a class="chat-filetransfer-accept" href="#" title="">' + acceptLabel + '</a>',
-                    refuseLink = '<a class="chat-filetransfer-refuse" href="#" title="">' + refuseLabel + '</a>',
-                    controls = $('<div/>').html(acceptLink + '&nbsp;' + refuseLink),
-                    chatContent = this.$el.find('.chat-content');
+            showFiletransferNotification: function (message) {
+                var chatContent = this.$el.find('.chat-content'),
+                    notificationClassName = 'chat-filetransfer',
+                    notification = chatContent.find('.' + notificationClassName);
 
-                chatContent.find('div.chat-event').remove().end()
-                    .append($('<div class="chat-event"></div>').html(message).append(controls));
-                this.scrollDown();
+                if (notification.length === 0) {
+                    notification = $('<div class="' + notificationClassName + '"></div>');
+
+                    chatContent.append(notification);
+                }
+
+                notification.text(message);
             },
 
-            showFiletransferNotification: function (message) {
-                var chatContent = this.$el.find('.chat-content');
+            showFiletransferControls: function (controls) {
+                var chatContent = this.$el.find('.chat-content'),
+                    controlsClassName = 'chat-filetransfer-controls',
+                    existingControls = chatContent.find('.' + controlsClassName);
 
-                chatContent.find('div.chat-event').remove().end()
-                    .append($('<div class="chat-event"></div>').html(message));
-                this.scrollDown();
+                if (!controls.hasClass(controlsClassName)) {
+                    controls.addClass(controlsClassName)
+                }
+
+                if (existingControls.length > 0) {
+                    chatContent.html(controls.html());
+                }
+                else {
+                    chatContent.append(controls);
+                }
+            },
+
+            removeFiletransferControls: function () {
+                this.$el.find('.chat-filetransfer-controls').remove();
             },
 
             clearChatRoomMessages: function (ev) {
@@ -1421,7 +1438,8 @@
                         fileSize: file.size,
                         fileType: file.type
                     },
-                    message;
+                    message,
+                    controls;
 
                 converse.peerTransferHandler.send(remoteJid, data, function (transfer, data) {
                     transfer.file = {
@@ -1435,12 +1453,19 @@
                 });
 
                 message = __(
-                    'Waiting for %1$s to accept file "%2$s".',
-                    [fileReceiverFullName, file.name]
-                );
+                        'Waiting for %1$s to accept file "%2$s".',
+                        [fileReceiverFullName, file.name]
+                    ),
+
+                controls = $('<div>')
+                    .append(
+                        $('<a class="chat-filetransfer-cancel" href="#">')
+                        .text(__('Cancel transfer'))
+                    );
 
                 this.toggleFiletransferMenu();
                 this.showFiletransferNotification(message);
+                this.showFiletransferControls(controls);
             },
 
             acceptFiletransfer: function (ev) {
@@ -1455,13 +1480,14 @@
 
             refuseFiletransfer: function (ev) {
                 var fileSenderJid = Strophe.getBareJidFromJid(this.model.get('jid')),
-                    approved = false,
+                    isApproved = false,
                     message = __('Transfer cancelled.');
 
                 ev.preventDefault();
                 ev.stopPropagation();
 
-                this.sendProposalResponse(fileSenderJid, approved);
+                this.sendProposalResponse(fileSenderJid, isApproved);
+                this.removeFiletransferControls();
                 this.showFiletransferNotification(message);
             },
 
@@ -2744,12 +2770,16 @@
                     if (chatBoxView) {
                         var contactName = chatBoxView.model.get('fullname'),
                             fileName = data.fileName,
-                            info = filesize(data.fileSize) + ', ' + data.fileType;
+                            info = filesize(data.fileSize) + ', ' + data.fileType,
+                            acceptControls = '<a class="chat-filetransfer-accept" href="#" title="">' + __('Accept') + '</a>',
+                            refuseControl = '<a class="chat-filetransfer-refuse" href="#" title="">' + __('Refuse') + '</a>',
+                            controls = $('<div>').html(acceptControls + '&nbsp;' + refuseControl);
 
-                        chatBoxView.showFileProposalNotification(
-                            __('%1$s wants to send file "%2$s" (%3$s).', [contactName, fileName, info]),
-                            __('Accept'),
-                            __('Refuse')
+                        chatBoxView.showFiletransferNotification(
+                            __('%1$s wants to send file "%2$s" (%3$s).', [contactName, fileName, info])
+                        );
+                        chatBoxView.showFiletransferControls(
+                            controls
                         );
                         converse.notifyIfNotFocused(
                             __('%1$s wants to send you a file', [contactName]),
@@ -2779,6 +2809,7 @@
                             [file.name]
                         );
 
+                        chatBoxView.removeFiletransferControls();
                         chatBoxView.showFiletransferNotification(message);
                     }
 
@@ -2800,6 +2831,7 @@
                             [file.name]
                         );
 
+                        chatBoxView.removeFiletransferControls();
                         chatBoxView.showFiletransferNotification(message);
                     }
                 }
@@ -2817,25 +2849,24 @@
                     file.id = (new Date).getTime();
 
                     console.log('file id', file.id);
-
-                    chatBoxView.showFiletransferNotification(
-                        '<div class="chat-filetransfer-progress_' + file.id + '"></div>'
-                    );
                 }
 
                 function performDownload () {
                     var url = self.getDownloadUrl(file),
-                        notificationHtml =
-                            '<div><a href="' + url + '" target="_blank" download="' + file.name + '">' +
-                            __('Click to save "%1$s" to your files.', [file.name]) +
-                            '</a></div>';
+                        savingControls = $('<div>')
+                            .append(
+                                $('<a href="' + url + '" target="_blank" download="' + file.name + '">')
+                                .text(
+                                    __('Click to save "%1$s" to your files.', [file.name])
+                                )
+                            );
 
                     dataToSend = {
                         type: 'receipt',
                         from: Strophe.getBareJidFromJid(converse.connection.jid)
                     };
 
-                    chatBoxView.showFiletransferNotification(notificationHtml);
+                    chatBoxView.showFiletransferControls(savingControls);
 
                     converse.peerTransferHandler.send(bareJid, dataToSend);
                 }
@@ -2895,6 +2926,7 @@
                             [file.name]
                         );
 
+                        chatBoxView.removeFiletransferControls();
                         chatBoxView.showFiletransferNotification(message);
                     }
                 }

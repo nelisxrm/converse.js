@@ -3,7 +3,7 @@
  * http://conversejs.org
  *
  * Copyright (c) 2012-2014, Jan-Carel Brand <jc@opkode.com>
- * Licensed under the Mozilla Public License 
+ * Licensed under the Mozilla Public License
  */
 @font-face {
   font-family: 'Converse-js';
@@ -708,6 +708,8 @@ span.spinner.hor_centered {
 }
 #conversejs .chat-event,
 #conversejs .chat-date,
+#conversejs .chat-file-proposal,
+#conversejs .chat-filetransfer,
 #conversejs .chat-info {
   color: #808080;
 }
@@ -1261,6 +1263,10 @@ select#select-xmpp-status {
   display: block;
   padding: 1px;
   text-decoration: none;
+}
+#conversejs .chat-toolbar .toggle-filetransfer ul li input {
+  min-width: initial !important;
+  padding: 0;
 }
 #conversejs .chat-toolbar-text {
   font-size: 12px;

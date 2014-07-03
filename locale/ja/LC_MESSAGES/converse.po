@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Converse.js 0.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-02 13:58+0200\n"
+"POT-Creation-Date: 2014-07-03 10:54+0200\n"
 "PO-Revision-Date: 2014-01-07 11:32+0900\n"
 "Last-Translator: Mako N <mako@pasero.net>\n"
 "Language-Team: Language JA\n"
@@ -138,48 +138,48 @@ msgstr "メッセージ"
 msgid "Personal message"
 msgstr "私信"
 
-#: converse.js:1068
+#: converse.js:1081
 #, fuzzy
 msgid "Are you sure you want to clear the messages from this room?"
 msgstr "この談話室のメンバー一覧にいません"
 
-#: converse.js:1089
+#: converse.js:1102
 msgid "me"
 msgstr "私"
 
-#: converse.js:1179 converse.js:2175
+#: converse.js:1192 converse.js:2197
 msgid "Show this menu"
 msgstr "このメニューを表示"
 
-#: converse.js:1180 converse.js:2176
+#: converse.js:1193 converse.js:2198
 msgid "Write in the third person"
 msgstr "第三者に書く"
 
-#: converse.js:1181 converse.js:2180
+#: converse.js:1194 converse.js:2202
 msgid "Remove messages"
 msgstr "メッセージを削除"
 
-#: converse.js:1267
+#: converse.js:1280
 msgid "Are you sure you want to clear the messages from this chat box?"
 msgstr ""
 
-#: converse.js:1302
+#: converse.js:1315
 msgid "Your message could not be sent"
 msgstr "メッセージを送信できませんでした"
 
-#: converse.js:1305
+#: converse.js:1318
 msgid "We received an unencrypted message"
 msgstr "暗号化されていないメッセージを受信しました"
 
-#: converse.js:1308
+#: converse.js:1321
 msgid "We received an unreadable encrypted message"
 msgstr "読めない暗号化メッセージを受信しました"
 
-#: converse.js:1317
+#: converse.js:1330
 msgid "This user has requested an encrypted session."
 msgstr "このユーザーは暗号化セッションを求めています。"
 
-#: converse.js:1339
+#: converse.js:1352
 msgid ""
 "Here are the fingerprints, please confirm them with %1$s, outside of this "
 "chat.\n"
@@ -200,7 +200,7 @@ msgstr ""
 "確認して、鍵指紋が正しければ「OK」を、正しくなければ「キャンセル」をクリック"
 "してください。"
 
-#: converse.js:1352
+#: converse.js:1365
 #, fuzzy
 msgid ""
 "You will be prompted to provide a security question and then an answer to "
@@ -214,353 +214,357 @@ msgstr ""
 "相手にも、同じ質問が表示され、正しく同じ答(大文字・小文字は区別されます)を入"
 "力することで、本人性を検証します。"
 
-#: converse.js:1353
+#: converse.js:1366
 msgid "What is your security question?"
 msgstr "秘密の質問はなんですか?"
 
-#: converse.js:1355
+#: converse.js:1368
 msgid "What is the answer to the security question?"
 msgstr "秘密の質問の答はなんですか?"
 
-#: converse.js:1359
+#: converse.js:1372
 msgid "Invalid authentication scheme provided"
 msgstr "認証の方式が正しくありません"
 
-#: converse.js:1438
+#: converse.js:1452
 msgid "Waiting for %1$s to accept file \"%2$s\"."
 msgstr ""
 
 #: converse.js:1459
+msgid "Cancel transfer"
+msgstr ""
+
+#: converse.js:1480
 msgid "Transfer cancelled."
 msgstr ""
 
-#: converse.js:1575
+#: converse.js:1597
 msgid "Your messages are not encrypted anymore"
 msgstr "メッセージはもう暗号化されません"
 
-#: converse.js:1577
+#: converse.js:1599
 msgid ""
 "Your messages are now encrypted but your buddy's identity has not been "
 "verified."
 msgstr ""
 "メッセージは暗号化されますが、相手が本人であることは検証されていません。"
 
-#: converse.js:1579
+#: converse.js:1601
 msgid "Your buddy's identify has been verified."
 msgstr "相手の本人性を検証しました。"
 
-#: converse.js:1581
+#: converse.js:1603
 msgid "Your buddy has ended encryption on their end, you should do the same."
 msgstr "相手は、暗号化を終了しました。あなたもそれに合わせる必要があります。"
 
-#: converse.js:1590
+#: converse.js:1612
 msgid "Your messages are not encrypted. Click here to enable OTR encryption."
 msgstr ""
 "メッセージは暗号化されません。OTR 暗号化を有効にするにはここをクリックしてく"
 "ださい。"
 
-#: converse.js:1592
+#: converse.js:1614
 msgid "Your messages are encrypted, but your buddy has not been verified."
 msgstr "メッセージは暗号化されますが、相手は検証されていません。"
 
-#: converse.js:1594
+#: converse.js:1616
 msgid "Your messages are encrypted and your buddy verified."
 msgstr "メッセージは暗号化され、相手も検証されています。"
 
-#: converse.js:1596
+#: converse.js:1618
 msgid ""
 "Your buddy has closed their end of the private session, you should do the "
 "same"
 msgstr "相手は私信を終了しました。あなたも同じようにしてください"
 
-#: converse.js:1607
+#: converse.js:1629
 msgid "End encrypted conversation"
 msgstr "暗号化された会話を終了"
 
-#: converse.js:1608
+#: converse.js:1630
 msgid "Refresh encrypted conversation"
 msgstr "暗号化された会話をリフレッシュ"
 
-#: converse.js:1609
+#: converse.js:1631
 msgid "Start encrypted conversation"
 msgstr "暗号化された会話を開始"
 
-#: converse.js:1610
+#: converse.js:1632
 msgid "Verify with fingerprints"
 msgstr "鍵指紋で検証"
 
-#: converse.js:1611
+#: converse.js:1633
 msgid "Verify with SMP"
 msgstr "SMP で検証"
 
-#: converse.js:1612
+#: converse.js:1634
 msgid "What's this?"
 msgstr "これは何ですか?"
 
-#: converse.js:1702
+#: converse.js:1724
 msgid "Online"
 msgstr "オンライン"
 
-#: converse.js:1703
+#: converse.js:1725
 msgid "Busy"
 msgstr "取り込み中"
 
-#: converse.js:1704
+#: converse.js:1726
 msgid "Away"
 msgstr "離席中"
 
-#: converse.js:1705
+#: converse.js:1727
 msgid "Offline"
 msgstr "オフライン"
 
-#: converse.js:1707
+#: converse.js:1729
 msgid "Contacts"
 msgstr "相手先"
 
-#: converse.js:1710
+#: converse.js:1732
 msgid "Contact name"
 msgstr "名前"
 
-#: converse.js:1711
+#: converse.js:1733
 msgid "Search"
 msgstr "検索"
 
-#: converse.js:1715
+#: converse.js:1737
 msgid "Contact username"
 msgstr "相手先の名前"
 
-#: converse.js:1716
+#: converse.js:1738
 msgid "Add"
 msgstr "追加"
 
-#: converse.js:1722
+#: converse.js:1744
 msgid "Click to add new chat contacts"
 msgstr "クリックして新しいチャットの相手先を追加"
 
-#: converse.js:1723
+#: converse.js:1745
 msgid "Add a contact"
 msgstr "相手先を追加"
 
-#: converse.js:1749
+#: converse.js:1771
 msgid "No users found"
 msgstr "ユーザーが見つかりません"
 
-#: converse.js:1755
+#: converse.js:1777
 msgid "Click to add as a chat contact"
 msgstr "クリックしてチャットの相手先として追加"
 
-#: converse.js:1810
+#: converse.js:1832
 msgid "Room name"
 msgstr "談話室の名前"
 
-#: converse.js:1811
+#: converse.js:1833
 msgid "Nickname"
 msgstr "ニックネーム"
 
-#: converse.js:1812
+#: converse.js:1834
 msgid "Server"
 msgstr "サーバー"
 
-#: converse.js:1813
+#: converse.js:1835
 msgid "Join"
 msgstr "入室"
 
-#: converse.js:1814
+#: converse.js:1836
 msgid "Show rooms"
 msgstr "談話室一覧を見る"
 
-#: converse.js:1834
+#: converse.js:1856
 msgid "Rooms"
 msgstr "談話室"
 
 #. For translators: %1$s is a variable and will be replaced with the XMPP server name
-#: converse.js:1841
+#: converse.js:1863
 msgid "No rooms on %1$s"
 msgstr "%1$s に談話室はありません"
 
 #. For translators: %1$s is a variable and will be
 #. replaced with the XMPP server name
-#: converse.js:1856
+#: converse.js:1878
 msgid "Rooms on %1$s"
 msgstr "%1$s の談話室一覧"
 
-#: converse.js:1865
+#: converse.js:1887
 msgid "Click to open this room"
 msgstr "クリックしてこの談話室を開く"
 
-#: converse.js:1866
+#: converse.js:1888
 msgid "Show more information on this room"
 msgstr "この談話室についての詳細を見る"
 
-#: converse.js:1928
+#: converse.js:1950
 msgid "Description:"
 msgstr "説明: "
 
-#: converse.js:1929
+#: converse.js:1951
 msgid "Occupants:"
 msgstr "入室者:"
 
-#: converse.js:1930
+#: converse.js:1952
 msgid "Features:"
 msgstr "特徴:"
 
-#: converse.js:1931
+#: converse.js:1953
 msgid "Requires authentication"
 msgstr "認証の要求"
 
-#: converse.js:1932
+#: converse.js:1954
 msgid "Hidden"
 msgstr "非表示"
 
-#: converse.js:1933
+#: converse.js:1955
 msgid "Requires an invitation"
 msgstr "招待の要求"
 
-#: converse.js:1934
+#: converse.js:1956
 msgid "Moderated"
 msgstr "発言制限"
 
-#: converse.js:1935
+#: converse.js:1957
 msgid "Non-anonymous"
 msgstr "非匿名"
 
-#: converse.js:1936
+#: converse.js:1958
 msgid "Open room"
 msgstr "開放談話室"
 
-#: converse.js:1937
+#: converse.js:1959
 msgid "Permanent room"
 msgstr "常設談話室"
 
-#: converse.js:1938
+#: converse.js:1960
 msgid "Public"
 msgstr "公開談話室"
 
-#: converse.js:1939
+#: converse.js:1961
 msgid "Semi-anonymous"
 msgstr "半匿名"
 
-#: converse.js:1940
+#: converse.js:1962
 msgid "Temporary room"
 msgstr "臨時談話室"
 
-#: converse.js:1941
+#: converse.js:1963
 msgid "Unmoderated"
 msgstr "発言制限なし"
 
-#: converse.js:2177
+#: converse.js:2199
 msgid "Set chatroom topic"
 msgstr "談話室の話題を設定"
 
-#: converse.js:2178
+#: converse.js:2200
 msgid "Kick user from chatroom"
 msgstr "ユーザーを談話室から蹴り出す"
 
-#: converse.js:2179
+#: converse.js:2201
 msgid "Ban user from chatroom"
 msgstr "ユーザーを談話室から締め出す"
 
-#: converse.js:2195
+#: converse.js:2217
 msgid "Message"
 msgstr "メッセージ"
 
-#: converse.js:2275 converse.js:3909
+#: converse.js:2297 converse.js:3935
 msgid "Save"
 msgstr "保存"
 
-#: converse.js:2276
+#: converse.js:2298
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: converse.js:2321
+#: converse.js:2343
 msgid "An error occurred while trying to save the form."
 msgstr "フォームを保存する際にエラーが発生しました。"
 
-#: converse.js:2367
+#: converse.js:2389
 msgid "This chatroom requires a password"
 msgstr "この談話室にはパスワードが必要です"
 
-#: converse.js:2368
+#: converse.js:2390
 msgid "Password: "
 msgstr "パスワード:"
 
-#: converse.js:2369
+#: converse.js:2391
 msgid "Submit"
 msgstr "送信"
 
-#: converse.js:2383
+#: converse.js:2405
 msgid "This room is not anonymous"
 msgstr "この談話室は非匿名です"
 
-#: converse.js:2384
+#: converse.js:2406
 msgid "This room now shows unavailable members"
 msgstr "この談話室はメンバー以外にも見えます"
 
-#: converse.js:2385
+#: converse.js:2407
 msgid "This room does not show unavailable members"
 msgstr "この談話室はメンバー以外には見えません"
 
-#: converse.js:2386
+#: converse.js:2408
 msgid "Non-privacy-related room configuration has changed"
 msgstr "談話室の設定(プライバシーに無関係)が変更されました"
 
-#: converse.js:2387
+#: converse.js:2409
 msgid "Room logging is now enabled"
 msgstr "談話室の記録を取りはじめます"
 
-#: converse.js:2388
+#: converse.js:2410
 msgid "Room logging is now disabled"
 msgstr "談話室の記録を止めます"
 
-#: converse.js:2389
+#: converse.js:2411
 msgid "This room is now non-anonymous"
 msgstr "この談話室はただいま非匿名です"
 
-#: converse.js:2390
+#: converse.js:2412
 msgid "This room is now semi-anonymous"
 msgstr "この談話室はただいま半匿名です"
 
-#: converse.js:2391
+#: converse.js:2413
 msgid "This room is now fully-anonymous"
 msgstr "この談話室はただいま匿名です"
 
-#: converse.js:2392
+#: converse.js:2414
 msgid "A new room has been created"
 msgstr "新しい談話室が作成されました"
 
-#: converse.js:2393
+#: converse.js:2415
 msgid "Your nickname has been changed"
 msgstr "ニックネームを変更しました"
 
-#: converse.js:2407
+#: converse.js:2429
 msgid "<strong>%1$s</strong> has been banned"
 msgstr "<strong>%1$s</strong> を締め出しました"
 
-#: converse.js:2408
+#: converse.js:2430
 msgid "<strong>%1$s</strong> has been kicked out"
 msgstr "<strong>%1$s</strong> を蹴り出しました"
 
-#: converse.js:2409
+#: converse.js:2431
 msgid "<strong>%1$s</strong> has been removed because of an affiliation change"
 msgstr "分掌の変更のため、<strong>%1$s</strong> を削除しました"
 
-#: converse.js:2410
+#: converse.js:2432
 msgid "<strong>%1$s</strong> has been removed for not being a member"
 msgstr "メンバーでなくなったため、<strong>%1$s</strong> を削除しました"
 
-#: converse.js:2414 converse.js:2474
+#: converse.js:2436 converse.js:2496
 msgid "You have been banned from this room"
 msgstr "この談話室から締め出されました"
 
-#: converse.js:2415
+#: converse.js:2437
 msgid "You have been kicked from this room"
 msgstr "この談話室から蹴り出されました"
 
-#: converse.js:2416
+#: converse.js:2438
 msgid "You have been removed from this room because of an affiliation change"
 msgstr "分掌の変更のため、この談話室から削除されました"
 
-#: converse.js:2417
+#: converse.js:2439
 msgid ""
 "You have been removed from this room because the room has changed to members-"
 "only and you're not a member"
@@ -568,183 +572,183 @@ msgstr ""
 "談話室がメンバー制に変更されました。メンバーではないため、この談話室から削除"
 "されました"
 
-#: converse.js:2418
+#: converse.js:2440
 msgid ""
 "You have been removed from this room because the MUC (Multi-user chat) "
 "service is being shut down."
 msgstr ""
 "MUC(グループチャット)のサービスが停止したため、この談話室から削除されました。"
 
-#: converse.js:2472
+#: converse.js:2494
 msgid "You are not on the member list of this room"
 msgstr "この談話室のメンバー一覧にいません"
 
-#: converse.js:2478
+#: converse.js:2500
 msgid "No nickname was specified"
 msgstr "ニックネームがありません"
 
-#: converse.js:2482
+#: converse.js:2504
 msgid "You are not allowed to create new rooms"
 msgstr "新しい談話室を作成する権限がありません"
 
-#: converse.js:2484
+#: converse.js:2506
 msgid "Your nickname doesn't conform to this room's policies"
 msgstr "ニックネームがこの談話室のポリシーに従っていません"
 
-#: converse.js:2486
+#: converse.js:2508
 msgid "Your nickname is already taken"
 msgstr "ニックネームは既に使われています"
 
-#: converse.js:2488
+#: converse.js:2510
 msgid "This room does not (yet) exist"
 msgstr "この談話室は存在しません"
 
-#: converse.js:2490
+#: converse.js:2512
 msgid "This room has reached it's maximum number of occupants"
 msgstr "この談話室は入室者数の上限に達しています"
 
-#: converse.js:2568
+#: converse.js:2590
 msgid "Topic set by %1$s to: %2$s"
 msgstr "%1$s が話題を設定しました: %2$s"
 
-#: converse.js:2598
+#: converse.js:2620
 msgid "This user is a moderator"
 msgstr "このユーザーは司会者です"
 
-#: converse.js:2599
+#: converse.js:2621
 msgid "This user can send messages in this room"
 msgstr "このユーザーはこの談話室で発言できます"
 
-#: converse.js:2600
+#: converse.js:2622
 msgid "This user can NOT send messages in this room"
 msgstr "このユーザーはこの談話室で発言できません"
 
-#: converse.js:2750
-msgid "%1$s wants to send file \"%2$s\" (%3$s)."
-msgstr ""
-
-#: converse.js:2751 converse.js:3343
+#: converse.js:2770 converse.js:3369
 msgid "Accept"
 msgstr ""
 
-#: converse.js:2752
+#: converse.js:2771
 msgid "Refuse"
 msgstr ""
 
-#: converse.js:2755
+#: converse.js:2775
+msgid "%1$s wants to send file \"%2$s\" (%3$s)."
+msgstr ""
+
+#: converse.js:2781
 msgid "%1$s wants to send you a file"
 msgstr ""
 
-#: converse.js:2756
+#: converse.js:2782
 msgid "\"%1$s\" (%2$s)"
 msgstr ""
 
-#: converse.js:2778
+#: converse.js:2804
 msgid "File \"%1$s\" accepted."
 msgstr ""
 
-#: converse.js:2799
+#: converse.js:2826
 msgid "Transfer of \"%1$s\" cancelled."
 msgstr ""
 
-#: converse.js:2830
+#: converse.js:2856
 msgid "Click to save \"%1$s\" to your files."
 msgstr ""
 
-#: converse.js:2894
+#: converse.js:2920
 msgid "File \"%1$s\" received."
 msgstr ""
 
-#: converse.js:3092
+#: converse.js:3118
 #, fuzzy
 msgid "Click to restore this chat"
 msgstr "クリックしてこの相手先を削除"
 
-#: converse.js:3232
+#: converse.js:3258
 msgid "Minimized"
 msgstr ""
 
-#: converse.js:3286
+#: converse.js:3312
 #, fuzzy
 msgid "Are you sure you want to remove this contact?"
 msgstr "クリックしてこの相手先を削除"
 
-#: converse.js:3336 converse.js:3354
+#: converse.js:3362 converse.js:3380
 msgid "Click to remove this contact"
 msgstr "クリックしてこの相手先を削除"
 
-#: converse.js:3344
+#: converse.js:3370
 #, fuzzy
 msgid "Decline"
 msgstr "オンライン"
 
-#: converse.js:3353
+#: converse.js:3379
 msgid "Click to chat with this contact"
 msgstr "クリックしてこの相手先とチャット"
 
-#: converse.js:3681
+#: converse.js:3707
 msgid "My contacts"
 msgstr "相手先一覧"
 
-#: converse.js:3686
+#: converse.js:3712
 msgid "Contact requests"
 msgstr "会話に呼び出し"
 
-#: converse.js:3690
+#: converse.js:3716
 msgid "Pending contacts"
 msgstr "保留中の相手先"
 
-#: converse.js:3908
+#: converse.js:3934
 msgid "Custom status"
 msgstr "独自の在席状況"
 
-#: converse.js:3934 converse.js:3942
+#: converse.js:3960 converse.js:3968
 msgid "online"
 msgstr "在席"
 
-#: converse.js:3936
+#: converse.js:3962
 msgid "busy"
 msgstr "取り込み中"
 
-#: converse.js:3938
+#: converse.js:3964
 msgid "away for long"
 msgstr "不在"
 
-#: converse.js:3940
+#: converse.js:3966
 msgid "away"
 msgstr "離席中"
 
 #. For translators: the %1$s part gets replaced with the status
 #. Example, I am online
-#: converse.js:3954 converse.js:3979
+#: converse.js:3980 converse.js:4005
 msgid "I am %1$s"
 msgstr "私はいま %1$s"
 
-#: converse.js:3959 converse.js:3981
+#: converse.js:3985 converse.js:4007
 msgid "Click here to write a custom status message"
 msgstr "状況メッセージを入力するには、ここをクリック"
 
-#: converse.js:3960 converse.js:3982
+#: converse.js:3986 converse.js:4008
 msgid "Click to change your chat status"
 msgstr "クリックして、在席状況を変更"
 
-#: converse.js:4072
+#: converse.js:4098
 msgid "XMPP/Jabber Username:"
 msgstr "XMPP/Jabber ユーザー名:"
 
-#: converse.js:4073
+#: converse.js:4099
 msgid "Password:"
 msgstr "パスワード:"
 
-#: converse.js:4074
+#: converse.js:4100
 msgid "Log In"
 msgstr "ログイン"
 
-#: converse.js:4081
+#: converse.js:4107
 msgid "Sign in"
 msgstr "サインイン"
 
-#: converse.js:4140
+#: converse.js:4166
 msgid "Toggle chat"
 msgstr ""
 
