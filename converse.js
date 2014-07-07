@@ -1486,8 +1486,8 @@ notificationTimeout, notification);
             acceptFiletransfer: function (ev) {
                 var fileSenderJid = Strophe.getBareJidFromJid(this.model.get('jid')),
                     isApproved = true,
-                    message = __('Transfer accepted.');
-
+                    message = __('Receiving file.'),
+                    loaderControl = $('<span class="spinner"/>');
 
                 ev.preventDefault();
                 ev.stopPropagation();
@@ -1495,6 +1495,7 @@ notificationTimeout, notification);
                 this.sendProposalResponse(fileSenderJid, isApproved);
                 this.removeFiletransferControls();
                 this.showFiletransferNotification(message);
+                this.showFiletransferControls(loaderControl);
             },
 
             refuseFiletransfer: function (ev) {
@@ -2828,12 +2829,14 @@ notificationTimeout, notification);
 
                     if (chatBoxView && file) {
                         var message = __(
-                            'File "%1$s" accepted.',
-                            [file.name]
-                        );
+                                'Sending file "%1$s".',
+                                [file.name]
+                            ),
+                            loaderControl = $('<span class="spinner"/>');
 
                         chatBoxView.removeFiletransferControls();
                         chatBoxView.showFiletransferNotification(message);
+                        chatBoxView.showFiletransferControls(loaderControl);
                     }
 
                     converse.peerTransferHandler.send(bareJid, dataToSend);
@@ -2944,11 +2947,12 @@ notificationTimeout, notification);
 
                     if (chatBoxView && file) {
                         var message = __(
-                            'File "%1$s" received.',
+                            'File "%1$s" sent.',
                             [file.name]
                         );
 
                         chatBoxView.showFiletransferNotification(message);
+                        chatBoxView.removeFiletransferControls();
                     }
                 }
                 catch (e) {
