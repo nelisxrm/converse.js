@@ -145,13 +145,30 @@
             }
         },
         showDesktopNotification: function (title, message) {
+            var notificationPermission = notify.permissionLevel(),
+                notificationTimeout = converse.notifications_duration;
+
+            function showNotification() {
+                var notification = notify.createNotification(title, {
+                    body: message,
+                    icon: 'web/asset/images/logo-new-color.png',
+                    tag: (new Date).getTime()
+                });
+
+                console.log('notifying', notificationPermission,
+notificationTimeout, notification);
+
+                // `timeout` notification property not working on all browsers.
+                setTimeout(function () {
+                    notification.close();
+                }, notificationTimeout);
+            }
+
             try {
                 if (!notify.isSupported) {
                     console.log('desktop notifications are not supported', notificationPermission);
                     return;
                 }
-
-                var notificationPermission = notify.permissionLevel();
 
                 console.log('desktop notification permission', notificationPermission);
 
@@ -161,12 +178,7 @@
                         break;
 
                     case notify.PERMISSION_GRANTED:
-                        console.log('notifying', title, notify);
-
-                        notify.createNotification(title, {
-                            body: message,
-                            icon: 'web/asset/images/logo-new-color.png'
-                        });
+                        showNotification();
                         break;
 
                     case notify.PERMISSION_DENIED:
@@ -177,9 +189,9 @@
                 console.error(e);
             }
         },
-        truncateText: function (text, length) {
+        getTruncatedTextWithEllipsis: function (text, length) {
             return (text.length > length)
-                ? text.substr(0, length - 1) + '...'
+                ? text.substr(0, length - 1) + '…'
                 : text;
         }
     };
@@ -227,6 +239,7 @@
         this.hide_muc_server = false;
         this.i18n = locales.en;
         this.no_trimming = false; // Set to true for phantomjs tests (where browser apparently has no width)
+        this.notifications_duration = 8000; // In milliseconds.
         this.prebind = false;
         this.show_controlbox_by_default = false;
         this.show_only_online_users = false;
@@ -266,6 +279,7 @@
             'hide_muc_server',
             'i18n',
             'no_trimming',
+            'notifications_duration',
             'jid',
             'prebind',
             'rid',
@@ -924,7 +938,7 @@
 
                     converse.notifyIfNotFocused(
                         notificationTitle,
-                        converse.truncateText(body, 30)
+                        converse.getTruncatedTextWithEllipsis(body, 30)
                     );
                 }
             },
