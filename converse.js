@@ -123,6 +123,7 @@
                     ? Visibility.hidden()
                     : !document.hasFocus();
 
+                console.log(document.activeElement);
                 console.log('is page not focused?', isPageNotFocused);
 
                 if (isPageNotFocused) {
@@ -2710,7 +2711,7 @@ notificationTimeout, notification);
                 var filePathWithoutExtension = 'web/vendor/converse/src/sound/notification';
 
                 createjs.Sound.registerSound({
-                    src: filePathWithoutExtension + '.mp3|' + filePathWithoutExtension + '.ogg',
+                    src: filePathWithoutExtension + '.mp3',
                     id: 'notification'
                 });
             },
