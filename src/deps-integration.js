@@ -4,6 +4,7 @@ define("converse-dependencies", [
     "filesize",
     "locales",
     "backbone.localStorage",
+    "backbone.browserStorage",
     "backbone.overview",
     "jquery.tinysort",
     "jquery.browser",

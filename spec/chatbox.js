@@ -13,16 +13,10 @@
                 runs(function () {
                     utils.closeAllChatBoxes();
                     utils.removeControlBox();
-                });
-                waits(250);
-                runs(function () {
-                    converse.roster.localStorage._clear();
+                    converse.roster.browserStorage._clear();
                     utils.initConverse();
-                    utils.createCurrentContacts();
+                    utils.createContacts();
                     utils.openControlBox();
-                });
-                waits(250);
-                runs(function () {
                     utils.openContactsPanel();
                 });
             });
@@ -38,7 +32,7 @@
                 var online_contacts = this.rosterview.$el.find('dt#xmpp-contacts').siblings('dd.current-xmpp-contact').find('a.open-chat');
                 for (i=0; i<online_contacts.length; i++) {
                     $el = $(online_contacts[i]);
-                    jid = $el.text().replace(' ','.').toLowerCase() + '@localhost';
+                    jid = $el.text().replace(/ /g,'.').toLowerCase() + '@localhost';
                     view = this.rosterview.get(jid);
                     spyOn(view, 'openChat').andCallThrough();
                     view.delegateEvents(); // We need to rebind all events otherwise our spy won't be called
@@ -69,7 +63,7 @@
                 var online_contacts = this.rosterview.$el.find('dt#xmpp-contacts').siblings('dd.current-xmpp-contact').find('a.open-chat');
                 for (i=0; i<online_contacts.length; i++) {
                     $el = $(online_contacts[i]);
-                    jid = $el.text().replace(' ','.').toLowerCase() + '@localhost';
+                    jid = $el.text().replace(/ /g,'.').toLowerCase() + '@localhost';
                     view = this.rosterview.get(jid);
                     $el.click();
                     expect(this.chatboxviews.trimChats).toHaveBeenCalled();
@@ -80,7 +74,6 @@
                     expect(trimmed_chatboxes.addChat).toHaveBeenCalled();
                     expect(chatboxview.hide).toHaveBeenCalled();
                     trimmedview = trimmed_chatboxes.get(jid);
-                    expect(trimmedview.$el.is(":visible")).toBeTruthy();
                 }
 
                 // Test that they can be maximized again
@@ -102,7 +95,7 @@
             }, converse));
 
             it("is focused if its already open and you click on its corresponding roster item", $.proxy(function () {
-                var contact_jid = mock.cur_names[2].replace(' ','.').toLowerCase() + '@localhost';
+                var contact_jid = mock.cur_names[2].replace(/ /g,'.').toLowerCase() + '@localhost';
                 var i, $el, click, jid, view, chatboxview, chatbox;
                 // openControlBox was called earlier, so the controlbox is
                 // visible, but no other chat boxes have been created.
@@ -111,7 +104,7 @@
                 chatboxview = this.chatboxviews.get(contact_jid);
                 spyOn(chatboxview, 'focus');
                 $el = this.rosterview.$el.find('a.open-chat:contains("'+chatbox.get('fullname')+'")');
-                jid = $el.text().replace(' ','.').toLowerCase() + '@localhost';
+                jid = $el.text().replace(/ /g,'.').toLowerCase() + '@localhost';
                 view = this.rosterview.get(jid);
                 spyOn(view, 'openChat').andCallThrough();
                 view.delegateEvents(); // We need to rebind all events otherwise our spy won't be called
@@ -121,7 +114,7 @@
                 expect(chatboxview.focus).toHaveBeenCalled();
             }, converse));
 
-            it("can be saved to, and retrieved from, localStorage", $.proxy(function () {
+            it("can be saved to, and retrieved from, browserStorage", $.proxy(function () {
                 spyOn(converse, 'emit');
                 spyOn(this.chatboxviews, 'trimChats');
                 runs(function () {
@@ -135,11 +128,11 @@
                     // will be empty.
                     var newchatboxes = new this.ChatBoxes();
                     expect(newchatboxes.length).toEqual(0);
-                    // The chatboxes will then be fetched from localStorage inside the
+                    // The chatboxes will then be fetched from browserStorage inside the
                     // onConnected method
                     newchatboxes.onConnected();
                     expect(newchatboxes.length).toEqual(7);
-                    // Check that the chatboxes items retrieved from localStorage
+                    // Check that the chatboxes items retrieved from browserStorage
                     // have the same attributes values as the original ones.
                     attrs = ['id', 'box_id', 'visible'];
                     for (i=0; i<attrs.length; i++) {
@@ -218,10 +211,10 @@
                 });
             }.bind(converse));
 
-            it("will be removed from localStorage when closed", $.proxy(function () {
+            it("will be removed from browserStorage when closed", $.proxy(function () {
                 spyOn(converse, 'emit');
                 spyOn(converse.chatboxviews, 'trimChats');
-                this.chatboxes.localStorage._clear();
+                this.chatboxes.browserStorage._clear();
                 runs(function () {
                     utils.closeControlBox();
                 });
@@ -241,9 +234,9 @@
                     expect(converse.emit).toHaveBeenCalledWith('onChatBoxClosed', jasmine.any(Object));
                     var newchatboxes = new this.ChatBoxes();
                     expect(newchatboxes.length).toEqual(0);
-                    // onConnected will fetch chatboxes in localStorage, but
+                    // onConnected will fetch chatboxes in browserStorage, but
                     // because there aren't any open chatboxes, there won't be any
-                    // in localStorage either. XXX except for the controlbox
+                    // in browserStorage either. XXX except for the controlbox
                     newchatboxes.onConnected();
                     expect(newchatboxes.length).toEqual(1);
                     expect(newchatboxes.models[0].id).toBe("controlbox");
@@ -252,7 +245,7 @@
 
             describe("A chat toolbar", $.proxy(function () {
                 it("can be found on each chat box", $.proxy(function () {
-                    var contact_jid = mock.cur_names[2].replace(' ','.').toLowerCase() + '@localhost';
+                    var contact_jid = mock.cur_names[2].replace(/ /g,'.').toLowerCase() + '@localhost';
                     utils.openChatBoxFor(contact_jid);
                     var chatbox = this.chatboxes.get(contact_jid);
                     var view = this.chatboxviews.get(contact_jid);
@@ -264,7 +257,7 @@
                 }, converse));
 
                 it("contains a button for inserting emoticons", $.proxy(function () {
-                    var contact_jid = mock.cur_names[2].replace(' ','.').toLowerCase() + '@localhost';
+                    var contact_jid = mock.cur_names[2].replace(/ /g,'.').toLowerCase() + '@localhost';
                     utils.openChatBoxFor(contact_jid);
                     var view = this.chatboxviews.get(contact_jid);
                     var $toolbar = view.$el.find('ul.chat-toolbar');
@@ -323,7 +316,7 @@
 
                 it("contains a button for starting an encrypted chat session", $.proxy(function () {
                     // TODO: More tests can be added here...
-                    var contact_jid = mock.cur_names[2].replace(' ','.').toLowerCase() + '@localhost';
+                    var contact_jid = mock.cur_names[2].replace(/ /g,'.').toLowerCase() + '@localhost';
                     utils.openChatBoxFor(contact_jid);
                     var view = this.chatboxviews.get(contact_jid);
                     var $toolbar = view.$el.find('ul.chat-toolbar');
@@ -347,7 +340,7 @@
 
                 it("can contain a button for starting a call", $.proxy(function () {
                     var view, callButton, $toolbar;
-                    var contact_jid = mock.cur_names[2].replace(' ','.').toLowerCase() + '@localhost';
+                    var contact_jid = mock.cur_names[2].replace(/ /g,'.').toLowerCase() + '@localhost';
                     spyOn(converse, 'emit');
                     // First check that the button doesn't show if it's not enabled
                     // via "visible_toolbar_buttons"
@@ -372,7 +365,7 @@
 
                 it("can contain a button for clearing messages", $.proxy(function () {
                     var view, clearButton, $toolbar;
-                    var contact_jid = mock.cur_names[2].replace(' ','.').toLowerCase() + '@localhost';
+                    var contact_jid = mock.cur_names[2].replace(/ /g,'.').toLowerCase() + '@localhost';
                     // First check that the button doesn't show if it's not enabled
                     // via "visible_toolbar_buttons"
                     converse.visible_toolbar_buttons.clear = false;
@@ -412,7 +405,7 @@
                 it("can be received which will open a chatbox and be displayed inside it", $.proxy(function () {
                     spyOn(converse, 'emit');
                     var message = 'This is a received message';
-                    var sender_jid = mock.cur_names[0].replace(' ','.').toLowerCase() + '@localhost';
+                    var sender_jid = mock.cur_names[0].replace(/ /g,'.').toLowerCase() + '@localhost';
                         msg = $msg({
                             from: sender_jid,
                             to: this.connection.jid,
@@ -458,13 +451,10 @@
 
                 it("received for a minimized chat box will increment a counter on its header", $.proxy(function () {
                     var contact_name = mock.cur_names[0];
-                    var contact_jid = contact_name.replace(' ','.').toLowerCase() + '@localhost';
+                    var contact_jid = contact_name.replace(/ /g,'.').toLowerCase() + '@localhost';
                     spyOn(this, 'emit');
                     runs(function () {
                         utils.openChatBoxFor(contact_jid);
-                    });
-                    waits(50);
-                    runs(function () {
                         var chatview = converse.chatboxviews.get(contact_jid);
                         expect(chatview.model.get('minimized')).toBeFalsy();
                         chatview.$el.find('.toggle-chatbox-button').click();
@@ -474,7 +464,7 @@
                         var chatview = this.chatboxviews.get(contact_jid);
                         expect(chatview.model.get('minimized')).toBeTruthy();
                         var message = 'This message is sent to a minimized chatbox';
-                        var sender_jid = mock.cur_names[0].replace(' ','.').toLowerCase() + '@localhost';
+                        var sender_jid = mock.cur_names[0].replace(/ /g,'.').toLowerCase() + '@localhost';
                         msg = $msg({
                             from: sender_jid,
                             to: this.connection.jid,
@@ -492,11 +482,10 @@
                         var $count = trimmedview.$el.find('.chat-head-message-count');
                         expect(trimmedview.model.get('minimized')).toBeTruthy();
                         expect($count.is(':visible')).toBeTruthy();
-                        expect($count.data('count')).toBe(1);
                         expect($count.html()).toBe('1');
                         this.chatboxes.onMessage(
                             $msg({
-                                from: mock.cur_names[0].replace(' ','.').toLowerCase() + '@localhost',
+                                from: mock.cur_names[0].replace(/ /g,'.').toLowerCase() + '@localhost',
                                 to: this.connection.jid,
                                 type: 'chat',
                                 id: (new Date()).getTime()
@@ -511,26 +500,20 @@
                         var $count = trimmedview.$el.find('.chat-head-message-count');
                         expect(trimmedview.model.get('minimized')).toBeTruthy();
                         expect($count.is(':visible')).toBeTruthy();
-                        expect($count.data('count')).toBe(2);
                         expect($count.html()).toBe('2');
                         trimmedview.$el.find('.restore-chat').click();
                     }, converse));
-                    waits(50);
+                    waits(250);
                     runs($.proxy(function () {
                         var trimmed_chatboxes = this.minimized_chats;
-                        var trimmedview = trimmed_chatboxes.get(contact_jid);
-                        var $count = trimmedview.$el.find('.chat-head-message-count');
-                        expect(trimmedview.model.get('minimized')).toBeFalsy();
-                        expect($count.is(':visible')).toBeFalsy();
-                        expect($count.data('count')).toBeFalsy();
-                        expect($count.html()).toBe('0');
+                        expect(trimmed_chatboxes.keys().length).toBe(0);
                     }, converse));
                 }, converse));
-
+ 
                 it("will indicate when it has a time difference of more than a day between it and its predecessor", $.proxy(function () {
                     spyOn(converse, 'emit');
                     var contact_name = mock.cur_names[1];
-                    var contact_jid = contact_name.replace(' ','.').toLowerCase() + '@localhost';
+                    var contact_jid = contact_name.replace(/ /g,'.').toLowerCase() + '@localhost';
                     utils.openChatBoxFor(contact_jid);
                     utils.clearChatBoxMessages(contact_jid);
                     var one_day_ago = moment();
@@ -598,7 +581,7 @@
 
                 it("can be sent from a chatbox, and will appear inside it", $.proxy(function () {
                     spyOn(converse, 'emit');
-                    var contact_jid = mock.cur_names[0].replace(' ','.').toLowerCase() + '@localhost';
+                    var contact_jid = mock.cur_names[0].replace(/ /g,'.').toLowerCase() + '@localhost';
                     runs(function () {
                         utils.openChatBoxFor(contact_jid);
                     });
@@ -617,7 +600,7 @@
                 }, converse));
 
                 it("is sanitized to prevent Javascript injection attacks", $.proxy(function () {
-                    var contact_jid = mock.cur_names[0].replace(' ','.').toLowerCase() + '@localhost';
+                    var contact_jid = mock.cur_names[0].replace(/ /g,'.').toLowerCase() + '@localhost';
                     utils.openChatBoxFor(contact_jid);
                     var view = this.chatboxviews.get(contact_jid);
                     var message = '<p>This message contains <em>some</em> <b>markup</b></p>';
@@ -630,7 +613,7 @@
                 }, converse));
 
                 it("can contain hyperlinks, which will be clickable", $.proxy(function () {
-                    var contact_jid = mock.cur_names[0].replace(' ','.').toLowerCase() + '@localhost';
+                    var contact_jid = mock.cur_names[0].replace(/ /g,'.').toLowerCase() + '@localhost';
                     utils.openChatBoxFor(contact_jid);
                     var view = this.chatboxviews.get(contact_jid);
                     var message = 'This message contains a hyperlink: www.opkode.com';
@@ -642,8 +625,32 @@
                     expect(msg.html()).toEqual('This message contains a hyperlink: <a target="_blank" href="http://www.opkode.com">www.opkode.com</a>');
                 }, converse));
 
+                it("should display emoticons correctly", $.proxy(function () {
+                    var contact_jid = mock.cur_names[0].replace(/ /g,'.').toLowerCase() + '@localhost';
+                    utils.openChatBoxFor(contact_jid);
+                    var view = this.chatboxviews.get(contact_jid);
+                    var messages = [':)', ';)', ':D', ':P', '8)', '>:)', ':S', ':\\', '>:(', ':(', ':O', '(^.^)b', '<3'];
+                    var emoticons = [
+                        '<span class="emoticon icon-smiley"></span>', '<span class="emoticon icon-wink"></span>',
+                        '<span class="emoticon icon-grin"></span>', '<span class="emoticon icon-tongue"></span>',
+                        '<span class="emoticon icon-cool"></span>', '<span class="emoticon icon-evil"></span>',
+                        '<span class="emoticon icon-confused"></span>', '<span class="emoticon icon-wondering"></span>',
+                        '<span class="emoticon icon-angry"></span>', '<span class="emoticon icon-sad"></span>',
+                        '<span class="emoticon icon-shocked"></span>', '<span class="emoticon icon-thumbs-up"></span>',
+                        '<span class="emoticon icon-heart"></span>'
+                        ];
+                    spyOn(view, 'sendMessage').andCallThrough();
+                    for (var i = 0; i < messages.length; i++) {
+                        var message = messages[i];
+                        utils.sendMessage(view, message);
+                        expect(view.sendMessage).toHaveBeenCalled();
+                        var msg = view.$el.find('.chat-content').find('.chat-message').last().find('.chat-message-content');
+                        expect(msg.html()).toEqual(emoticons[i]);
+                    }
+                }, converse));
+
                 it("will have properly escaped URLs", $.proxy(function () {
-                    var contact_jid = mock.cur_names[0].replace(' ','.').toLowerCase() + '@localhost';
+                    var contact_jid = mock.cur_names[0].replace(/ /g,'.').toLowerCase() + '@localhost';
                     utils.openChatBoxFor(contact_jid);
                     var view = this.chatboxviews.get(contact_jid);
                     spyOn(view, 'sendMessage').andCallThrough();
@@ -684,9 +691,9 @@
             beforeEach(function () {
                 utils.closeAllChatBoxes();
                 utils.removeControlBox();
-                converse.roster.localStorage._clear();
+                converse.roster.browserStorage._clear();
                 utils.initConverse();
-                utils.createCurrentContacts();
+                utils.createContacts();
                 utils.openControlBox();
                 utils.openContactsPanel();
             });
@@ -701,7 +708,7 @@
                 // (e.g for when this test is run on its own).
                 utils.sendMessage(view, message);
                 expect(view.model.messages.length > 0).toBeTruthy();
-                expect(view.model.messages.localStorage.records.length > 0).toBeTruthy();
+                expect(view.model.messages.browserStorage.records.length > 0).toBeTruthy();
                 expect(converse.emit).toHaveBeenCalledWith('onMessageSend', message);
 
                 message = '/clear';
@@ -716,7 +723,7 @@
                 expect(view.clearMessages).toHaveBeenCalled();
                 expect(window.confirm).toHaveBeenCalled();
                 expect(view.model.messages.length, 0); // The messages must be removed from the chatbox
-                expect(view.model.messages.localStorage.records.length, 0); // And also from localStorage
+                expect(view.model.messages.browserStorage.records.length, 0); // And also from browserStorage
                 expect(converse.emit.callCount, 1);
                 expect(converse.emit.mostRecentCall.args, ['onMessageSend', message]);
             }, converse));
@@ -733,7 +740,7 @@
                 spyOn(converse, 'incrementMsgCounter').andCallThrough();
                 $(window).trigger('blur');
                 var message = 'This message will increment the message counter';
-                var sender_jid = mock.cur_names[0].replace(' ','.').toLowerCase() + '@localhost';
+                var sender_jid = mock.cur_names[0].replace(/ /g,'.').toLowerCase() + '@localhost';
                     msg = $msg({
                         from: sender_jid,
                         to: this.connection.jid,
@@ -764,7 +771,7 @@
                 spyOn(converse, 'incrementMsgCounter').andCallThrough();
                 $(window).trigger('focus');
                 var message = 'This message will not increment the message counter';
-                var sender_jid = mock.cur_names[0].replace(' ','.').toLowerCase() + '@localhost';
+                var sender_jid = mock.cur_names[0].replace(/ /g,'.').toLowerCase() + '@localhost';
                     msg = $msg({
                         from: sender_jid,
                         to: this.connection.jid,

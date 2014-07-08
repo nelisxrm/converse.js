@@ -605,6 +605,17 @@ span.spinner.hor_centered {
   right: 5px;
   bottom: 5px;
 }
+#conversejs .toggle-controlbox,
+#conversejs .toggle-minimized-chats {
+  float: right;
+  font-size: 85%;
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+  background-color: #5390c8;
+  padding: 4px 8px;
+  margin-right: 5px;
+  color: white;
+}
 #conversejs .chat-head {
   color: #ffffff;
   font-size: 100%;
@@ -746,6 +757,7 @@ input.error {
   float: left;
   margin-right: 6px;
 }
+#conversejs .restore-chat,
 #conversejs .chat-title {
   padding: 1px 0;
   color: white;
@@ -859,7 +871,6 @@ dl.add-converse-contact {
   padding: 2px 4px;
   font-size: 15px;
   text-align: center;
-  display: none;
   position: absolute;
   right: 22px;
   bottom: 1px;

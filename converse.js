@@ -24,14 +24,7 @@
             }
         );
     } else {
-        // Browser globals
-        // FIXME
-        _.templateSettings = {
-            evaluate : /\{\[([\s\S]+?)\]\}/g,
-            interpolate : /\{\{([\s\S]+?)\}\}/g
-        };
-        // TODO Templates not defined
-        root.converse = factory(jQuery, _, OTR, DSA, templates);
+        root.converse = factory(jQuery, _, OTR, DSA, JST, moment);
     }
 }(this, function ($, _, OTR, DSA, templates, moment, filesize) {
     "use strict";
@@ -62,6 +55,7 @@
             if (this.length > 0) {
                 this.each(function(i, obj) {
                     var text = $(obj).html();
+                    text = text.replace(/&gt;:\)/g, '<span class="emoticon icon-evil"></span>');
                     text = text.replace(/:\)/g, '<span class="emoticon icon-smiley"></span>');
                     text = text.replace(/:\-\)/g, '<span class="emoticon icon-smiley"></span>');
                     text = text.replace(/;\)/g, '<span class="emoticon icon-wink"></span>');
@@ -73,7 +67,6 @@
                     text = text.replace(/:p/g, '<span class="emoticon icon-tongue"></span>');
                     text = text.replace(/:\-p/g, '<span class="emoticon icon-tongue"></span>');
                     text = text.replace(/8\)/g, '<span class="emoticon icon-cool"></span>');
-                    text = text.replace(/&gt;:\)/g, '<span class="emoticon icon-evil"></span>');
                     text = text.replace(/:S/g, '<span class="emoticon icon-confused"></span>');
                     text = text.replace(/:\\/g, '<span class="emoticon icon-wondering"></span>');
                     text = text.replace(/:\/ /g, '<span class="emoticon icon-wondering"></span>');
@@ -84,7 +77,7 @@
                     text = text.replace(/:\-O/g, '<span class="emoticon icon-shocked"></span>');
                     text = text.replace(/\=\-O/g, '<span class="emoticon icon-shocked"></span>');
                     text = text.replace(/\(\^.\^\)b/g, '<span class="emoticon icon-thumbs-up"></span>');
-                    text = text.replace(/<3/g, '<span class="emoticon icon-heart"></span>');
+                    text = text.replace(/&lt;3/g, '<span class="emoticon icon-heart"></span>');
                     $(obj).html(text);
                 });
             }
@@ -245,6 +238,7 @@ notificationTimeout, notification);
         this.show_controlbox_by_default = false;
         this.show_only_online_users = false;
         this.show_toolbar = true;
+        this.storage = 'session';
         this.use_otr_by_default = false;
         this.use_vcards = true;
         this.visible_toolbar_buttons = {
@@ -288,6 +282,7 @@ notificationTimeout, notification);
             'show_only_online_users',
             'show_toolbar',
             'sid',
+            'storage',
             'use_otr_by_default',
             'use_vcards',
             'xhr_custom_status',
@@ -436,7 +431,7 @@ notificationTimeout, notification);
 
         this.reconnect = function () {
             converse.giveFeedback(__('Reconnecting'), 'error');
-            converse.emit('onReconnect');
+            converse.emit('reconnect');
             if (!converse.prebind) {
                 this.connection.connect(
                     this.connection.jid,
@@ -537,9 +532,9 @@ notificationTimeout, notification);
 
         this.initStatus = function (callback) {
             this.xmppstatus = new this.XMPPStatus();
-            var id = b64_sha1('converse.xmppstatus-'+this.bare_jid);
-            this.xmppstatus.id = id; // Appears to be necessary for backbone.localStorage
-            this.xmppstatus.localStorage = new Backbone.LocalStorage(id);
+            var id = b64_sha1('converse.xmppstatus-'+converse.bare_jid);
+            this.xmppstatus.id = id; // Appears to be necessary for backbone.browserStorage
+            this.xmppstatus.browserStorage = new Backbone.BrowserStorage[converse.storage](id);
             this.xmppstatus.fetch({success: callback, error: callback});
         };
 
@@ -567,13 +562,13 @@ notificationTimeout, notification);
         this.initRoster = function () {
             // Set up the roster
             this.roster = new this.RosterItems();
-            this.roster.localStorage = new Backbone.LocalStorage(
+            this.roster.browserStorage = new Backbone.BrowserStorage[converse.storage](
                 b64_sha1('converse.rosteritems-'+converse.bare_jid));
             this.registerRosterHandler();
             this.registerRosterXHandler();
             this.registerPresenceHandler();
             // Now create the view which will fetch roster items from
-            // localStorage
+            // browserStorage
             this.rosterview = new this.RosterView({'model':this.roster});
         };
 
@@ -655,7 +650,9 @@ notificationTimeout, notification);
                 this.connection.xmlInput = function (body) { console.log(body); };
                 this.connection.xmlOutput = function (body) { console.log(body); };
                 Strophe.log = function (level, msg) { console.log(level+' '+msg); };
-                Strophe.error = function (msg) { console.log('ERROR: '+msg); };
+                Strophe.error = function (msg) {
+                    console.log('ERROR: '+msg);
+                };
             }
             this.bare_jid = Strophe.getBareJidFromJid(this.connection.jid);
             this.domain = Strophe.getDomainFromJid(this.connection.jid);
@@ -684,7 +681,7 @@ notificationTimeout, notification);
                     }
                 }
             }, this));
-            converse.emit('onReady');
+            converse.emit('ready');
         };
 
         // Backbone Models and Views
@@ -735,22 +732,24 @@ notificationTimeout, notification);
                 var height = converse.applyHeightResistance(this.get('height'));
                 if (this.get('box_id') !== 'controlbox') {
                     this.messages = new converse.Messages();
-                    this.messages.localStorage = new Backbone.LocalStorage(
+                    this.messages.browserStorage = new Backbone.BrowserStorage[converse.storage](
                         b64_sha1('converse.messages'+this.get('jid')+converse.bare_jid));
 
                     this.save({
-                        'user_id' : Strophe.getNodeFromJid(this.get('jid')),
                         'box_id' : b64_sha1(this.get('jid')),
-                        'otr_status': this.get('otr_status') || UNENCRYPTED,
+                        'height': height,
                         'minimized': this.get('minimized') || false,
+                        'otr_status': this.get('otr_status') || UNENCRYPTED,
                         'time_minimized': this.get('time_minimized') || moment(),
                         'time_opened': this.get('time_opened') || moment().valueOf(),
-                        'height': height
+                        'user_id' : Strophe.getNodeFromJid(this.get('jid')),
+                        'num_unread': this.get('num_unread') || 0
                     });
                 } else {
                     this.set({
                         'height': height,
-                        'time_opened': moment(0).valueOf()
+                        'time_opened': moment(0).valueOf(),
+                        'num_unread': this.get('num_unread') || 0
                     });
                 }
             },
@@ -1037,7 +1036,7 @@ notificationTimeout, notification);
                         )
                     );
                 this.renderToolbar().renderAvatar();
-                converse.emit('onChatBoxOpened', this);
+                converse.emit('chatBoxOpened', this);
                 setTimeout(function () {
                     converse.refreshWebkit();
                 }, 50);
@@ -1252,7 +1251,7 @@ notificationTimeout, notification);
                         } else {
                             this.sendMessage(message);
                         }
-                        converse.emit('onMessageSend', message);
+                        converse.emit('messageSend', message);
                     }
                     this.$el.data('composing', false);
                 } else if (!this.model.get('chatroom')) {
@@ -1301,7 +1300,7 @@ notificationTimeout, notification);
                 if (result === true) {
                     this.$el.find('.chat-content').empty();
                     this.model.messages.reset();
-                    this.model.messages.localStorage._clear();
+                    this.model.messages.browserStorage._clear();
                 }
                 return this;
             },
@@ -1396,7 +1395,7 @@ notificationTimeout, notification);
             toggleCall: function (ev) {
                 ev.stopPropagation();
 
-                converse.emit('onCallButtonClicked', {
+                converse.emit('callButtonClicked', {
                     connection: converse.connection,
                     model: this.model
                 });
@@ -1538,11 +1537,11 @@ notificationTimeout, notification);
                             this.$el.find('div.chat-event').remove();
                         }
                     }
-                    converse.emit('onBuddyStatusChanged', item.attributes, item.get('chat_status'));
+                    converse.emit('buddyStatusChanged', item.attributes, item.get('chat_status'));
                 }
                 if (_.has(item.changed, 'status')) {
                     this.showStatusMessage();
-                    converse.emit('onBuddyStatusMessageChanged', item.attributes, item.get('status'));
+                    converse.emit('buddyStatusMessageChanged', item.attributes, item.get('status'));
                 }
                 if (_.has(item.changed, 'image')) {
                     this.renderAvatar();
@@ -1568,13 +1567,16 @@ notificationTimeout, notification);
                 return this;
             },
 
-            close: function () {
+            close: function (ev) {
+                if (ev && ev.preventDefault) {
+                    ev.preventDefault();
+                }
                 if (converse.connection) {
                     this.model.destroy();
                 } else {
                     this.model.trigger('hide');
                 }
-                converse.emit('onChatBoxClosed', this);
+                converse.emit('chatBoxClosed', this);
                 return this;
             },
 
@@ -1583,15 +1585,18 @@ notificationTimeout, notification);
                 this.$el.insertAfter(converse.chatboxviews.get("controlbox").$el).show('fast', $.proxy(function () {
                     converse.refreshWebkit();
                     this.focus();
-                    converse.emit('onChatBoxMaximized', this);
+                    converse.emit('chatBoxMaximized', this);
                 }, this));
             },
 
             minimize: function (ev) {
+                if (ev && ev.preventDefault) {
+                    ev.preventDefault();
+                }
                 // Minimizes a chat box
                 this.model.minimize();
                 this.$el.hide('fast', converse.refreshwebkit);
-                converse.emit('onChatBoxMinimized', this);
+                converse.emit('chatBoxMinimized', this);
             },
 
             updateVCard: function () {
@@ -1696,7 +1701,7 @@ notificationTimeout, notification);
 
             focus: function () {
                 this.$el.find('.chat-textarea').focus();
-                converse.emit('onChatBoxFocused', this);
+                converse.emit('chatBoxFocused', this);
                 return this;
             },
 
@@ -2096,7 +2101,7 @@ notificationTimeout, notification);
             hide: function (callback) {
                 this.$el.hide('fast', function () {
                     converse.refreshWebkit();
-                    converse.emit('onChatBoxClosed', this);
+                    converse.emit('chatBoxClosed', this);
                     converse.controlboxtoggle.show(function () {
                         if (typeof callback === "function") {
                             callback();
@@ -2110,7 +2115,7 @@ notificationTimeout, notification);
                     this.$el.show('fast', function () {
                         converse.refreshWebkit();
                     }.bind(this));
-                    converse.emit('onControlBoxOpened', this);
+                    converse.emit('controlBoxOpened', this);
                 }, this));
                 return this;
             },
@@ -2629,7 +2634,7 @@ notificationTimeout, notification);
                 });
                 if (display_sender === 'room') {
                     // We only emit an event if it's not our own message
-                    converse.emit('onMessage', message);
+                    converse.emit('message', message);
                 }
                 return true;
             },
@@ -2717,7 +2722,7 @@ notificationTimeout, notification);
             },
 
             onConnected: function () {
-                this.localStorage = new Backbone.LocalStorage(
+                this.browserStorage = new Backbone.BrowserStorage[converse.storage](
                     b64_sha1('converse.chatboxes-'+converse.bare_jid));
                 if (!this.get('controlbox')) {
                     this.add({
@@ -2781,7 +2786,7 @@ notificationTimeout, notification);
                 chatbox.receiveMessage($message);
 
                 converse.roster.addResource(buddy_jid, resource);
-                converse.emit('onMessage', message);
+                converse.emit('message', message);
 
                 return true;
             },
@@ -3136,9 +3141,7 @@ notificationTimeout, notification);
             },
 
             initialize: function () {
-                this.model.messages.on('add', function (msg) {
-                    this.updateUnreadMessagesCounter(_.clone(msg.attributes));
-                }, this);
+                this.model.messages.on('add', this.updateUnreadMessagesCounter, this);
                 this.model.on('showSentOTRMessage', this.updateUnreadMessagesCounter, this);
                 this.model.on('showReceivedOTRMessage', this.updateUnreadMessagesCounter, this);
                 this.model.on('change:minimized', this.clearUnreadMessagesCounter, this);
@@ -3160,21 +3163,13 @@ notificationTimeout, notification);
             },
 
             clearUnreadMessagesCounter: function () {
-                if (!this.model.get('minimized')) {
-                    this.$el.find('.chat-head-message-count').html(0).data('count', 0).hide();
-                }
+                this.model.set({'num_unread': 0});
+                this.render();
             },
 
-            updateUnreadMessagesCounter: function (msg_dict) {
-                var count, $count;
-                var msg_time = (typeof msg_dict === 'object' && moment(msg_dict.time)) || moment;
-                if (this.model.get('minimized') && (!msg_time.isBefore(this.model.get('time_minimized')))) {
-                    $count = this.$el.find('.chat-head-message-count');
-                    count = parseInt($count.data('count') || 0, 10) + 1;
-                    $count.html(count).data('count', count);
-                    if (!$count.is(':visible')) { $count.show('fast'); }
-                }
-                return this;
+            updateUnreadMessagesCounter: function () {
+                this.model.set({'num_unread': this.model.get('num_unread') + 1});
+                this.render();
             },
 
             close: function (ev) {
@@ -3183,7 +3178,7 @@ notificationTimeout, notification);
                 }
                 this.remove();
                 this.model.destroy();
-                converse.emit('onChatBoxClosed', this);
+                converse.emit('chatBoxClosed', this);
                 return this;
             },
 
@@ -3205,22 +3200,19 @@ notificationTimeout, notification);
 
             initialize: function () {
                 this.initToggle();
-                this.model.on("add", function (item) {
-                    if (item.get('minimized')) {
-                        this.addChat(item);
-                    }
-                }, this);
+                this.model.on("add", this.onChanged, this);
                 this.model.on("destroy", this.removeChat, this);
                 this.model.on("change:minimized", this.onChanged, this);
+                this.model.on('change:num_unread', this.updateUnreadMessagesCounter, this);
             },
 
             initToggle: function () {
                 this.toggleview = new converse.MinimizedChatsToggleView({
                     model: new converse.MinimizedChatsToggle()
                 });
-                var id = b64_sha1('converse.minchatstoggle'+this.bare_jid);
-                this.toggleview.model.id = id; // Appears to be necessary for backbone.localStorage
-                this.toggleview.model.localStorage = new Backbone.LocalStorage(id);
+                var id = b64_sha1('converse.minchatstoggle'+converse.bare_jid);
+                this.toggleview.model.id = id; // Appears to be necessary for backbone.browserStorage
+                this.toggleview.model.browserStorage = new Backbone.BrowserStorage[converse.storage](id);
                 this.toggleview.model.fetch();
             },
 
@@ -3237,14 +3229,14 @@ notificationTimeout, notification);
                 if (ev && ev.preventDefault) {
                     ev.preventDefault();
                 }
-                this.toggleview.model.save({'collapsed': !this.toggleview.model.get('collapsed')})
+                this.toggleview.model.save({'collapsed': !this.toggleview.model.get('collapsed')});
                 this.$('.minimized-chats-flyout').toggle();
             },
 
             onChanged: function (item) {
-                if (item.get('minimized')) {
+                if (item.get('id') !== 'controlbox' && item.get('minimized')) {
                     this.addChat(item);
-                } else {
+                } else if (this.get(item.get('id'))) {
                     this.removeChat(item);
                 }
             },
@@ -3265,6 +3257,13 @@ notificationTimeout, notification);
                 this.remove(item.get('id'));
                 this.toggleview.model.set({'num_minimized': this.keys().length});
                 this.render();
+            },
+
+            updateUnreadMessagesCounter: function () {
+                var ls = this.model.pluck('num_unread'), count = 0;
+                for (i=0; i<ls.length; i++) { count += ls[i]; }
+                this.toggleview.model.set({'num_unread': count});
+                this.render();
             }
         });
 
@@ -3272,7 +3271,8 @@ notificationTimeout, notification);
             initialize: function () {
                 this.set({
                     'collapsed': this.get('collapsed') || false,
-                    'num_minimized': 0
+                    'num_minimized': this.get('num_minimized') || 0,
+                    'num_unread':  this.get('num_unread') || 0,
                 });
             }
         });
@@ -3282,12 +3282,15 @@ notificationTimeout, notification);
 
             initialize: function () {
                 this.model.on('change:num_minimized', this.render, this);
+                this.model.on('change:num_unread', this.render, this);
                 this.$flyout = this.$el.siblings('.minimized-chats-flyout');
             },
 
             render: function () {
                 this.$el.html(converse.templates.toggle_chats(
-                    _.extend(this.model.toJSON(), {'Minimized': __('Minimized')})
+                    _.extend(this.model.toJSON(), {
+                        'Minimized': __('Minimized')
+                    })
                 ));
                 if (this.model.get('collapsed')) {
                     this.$flyout.hide();
@@ -3560,7 +3563,7 @@ notificationTimeout, notification);
             },
 
             rosterHandler: function (items) {
-                converse.emit('onRoster', items);
+                converse.emit('roster', items);
                 this.cleanCache(items);
                 _.each(items, function (item, index, items) {
                     if (this.isSelf(item.jid)) { return; }
@@ -3734,6 +3737,7 @@ notificationTimeout, notification);
 
                 this.model.on("remove", function (item) { this.removeRosterItemView(item); }, this);
                 this.model.on("destroy", function (item) { this.removeRosterItemView(item); }, this);
+                this.model.on("reset", function () { this.removeAllRosterItemViewss(); }, this);
 
                 var roster_markup = converse.templates.contacts({
                     'label_contacts': __('My contacts')
@@ -3771,6 +3775,12 @@ notificationTimeout, notification);
             addRosterItemView: function (item) {
                 var view = new converse.RosterItemView({model: item});
                 this.add(item.id, view);
+                return this;
+            },
+
+            removeAllRosterItemViewss: function () {
+                var views = this.removeAll();
+                this.render();
                 return this;
             },
 
@@ -3857,7 +3867,7 @@ notificationTimeout, notification);
                 if (!$count.is(':visible')) {
                     $count.show();
                 }
-                converse.emit('onRosterViewUpdated');
+                converse.emit('rosterViewUpdated');
                 return this;
             },
 
@@ -3888,10 +3898,10 @@ notificationTimeout, notification);
                         );
                     }
                     if (_.has(item.changed, 'status')) {
-                        converse.emit('onStatusChanged', this.get('status'));
+                        converse.emit('statusChanged', this.get('status'));
                     }
                     if (_.has(item.changed, 'status_message')) {
-                        converse.emit('onStatusMessageChanged', this.get('status_message'));
+                        converse.emit('statusMessageChanged', this.get('status_message'));
                     }
                 }, this));
             },
@@ -4064,10 +4074,10 @@ notificationTimeout, notification);
             */
             model: converse.Feature,
             initialize: function () {
-                this.localStorage = new Backbone.LocalStorage(
+                this.browserStorage = new Backbone.BrowserStorage[converse.storage](
                     b64_sha1('converse.features'+converse.bare_jid));
-                if (this.localStorage.records.length === 0) {
-                    // localStorage is empty, so we've likely never queried this
+                if (this.browserStorage.records.length === 0) {
+                    // browserStorage is empty, so we've likely never queried this
                     // domain for features yet
                     converse.connection.disco.info(converse.domain, null, $.proxy(this.onInfo, this));
                     converse.connection.disco.items(converse.domain, null, $.proxy(this.onItems, this));
@@ -4274,7 +4284,7 @@ notificationTimeout, notification);
         }
         if (this.show_controlbox_by_default) { this.controlboxtoggle.showControlBox(); }
         this.registerGlobalEventHandlers();
-        converse.emit('onInitialized');
+        converse.emit('initialized');
     };
 
     return {

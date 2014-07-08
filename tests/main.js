@@ -39,6 +39,7 @@ require([
         // Set up converse.js
         window.converse_api = converse;
         window.localStorage.clear();
+        window.sessionStorage.clear();
         converse.initialize({
             prebind: false,
             xhr_user_search: false,
@@ -63,7 +64,8 @@ require([
                 "spec/eventemitter",
                 "spec/controlbox",
                 "spec/chatbox",
-                "spec/chatroom"
+                "spec/chatroom",
+                "spec/minchats"
             ], function () {
                 // Make sure this callback is only called once.
                 delete converse.callback;
