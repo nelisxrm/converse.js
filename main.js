@@ -88,11 +88,7 @@ config = {
 
 if (typeof(require) !== 'undefined') {
     require.config(config);
-    require(["jquery", "converse"], function(require, $, converse) {
+    require(["converse"], function(converse) {
         window.converse = converse;
-    });
-
-    define('jquery', [], function() {
-        return jQuery;
     });
 }

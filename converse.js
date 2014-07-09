@@ -13,7 +13,8 @@
               ["converse-dependencies", "converse-templates"],
             function(dependencies, templates) {
                 console.log('dependencies', dependencies);
-                var otr = dependencies.otr,
+                var jQuery = dependencies.jQuery,
+                    otr = dependencies.otr,
                     moment = dependencies.moment,
                     filesize = dependencies.filesize;
                 if (typeof otr !== "undefined") {
@@ -24,10 +25,11 @@
             }
         );
     } else {
-        root.converse = factory(jQuery, _, OTR, DSA, JST, moment);
+        root.converse = factory(jQuery, _, OTR, DSA, JST, moment, filesize);
     }
 }(this, function ($, _, OTR, DSA, templates, moment, filesize) {
     "use strict";
+    console.info('jQuery verion', $.fn.jquery);
     if (typeof console === "undefined" || typeof console.log === "undefined") {
         console = { log: function () {}, error: function () {} };
     }

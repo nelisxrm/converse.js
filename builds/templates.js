@@ -1,3 +1,4 @@
+alert('jy suis');
 this["JST"] = this["JST"] || {};
 
 this["JST"]["action"] = function(obj) {

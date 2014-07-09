@@ -1,4 +1,5 @@
 define("converse-dependencies", [
+    "jquery",
     "otr",
     "moment",
     "filesize",
@@ -16,8 +17,9 @@ define("converse-dependencies", [
     "notify",
     "visibility",
     "sound"
-], function(otr, moment, filesize) {
+], function(jQuery, otr, moment, filesize) {
     return {
+        'jQuery': jQuery,
         'otr': otr,
         'moment': moment,
         'filesize': filesize
