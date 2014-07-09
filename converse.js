@@ -13,7 +13,7 @@
               ["converse-dependencies", "converse-templates"],
             function(dependencies, templates) {
                 console.log('dependencies', dependencies);
-                var jQuery = dependencies.jQuery,
+                var jQuery = dependencies.jQuery.noConflict(true),
                     otr = dependencies.otr,
                     moment = dependencies.moment,
                     filesize = dependencies.filesize;
@@ -29,7 +29,7 @@
     }
 }(this, function ($, _, OTR, DSA, templates, moment, filesize) {
     "use strict";
-    console.info('jQuery verion', $.fn.jquery);
+
     if (typeof console === "undefined" || typeof console.log === "undefined") {
         console = { log: function () {}, error: function () {} };
     }
@@ -3263,7 +3263,7 @@ notificationTimeout, notification);
 
             updateUnreadMessagesCounter: function () {
                 var ls = this.model.pluck('num_unread'), count = 0;
-                for (i=0; i<ls.length; i++) { count += ls[i]; }
+                for (var i=0; i<ls.length; i++) { count += ls[i]; }
                 this.toggleview.model.set({'num_unread': count});
                 this.render();
             }
