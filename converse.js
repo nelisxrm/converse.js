@@ -994,7 +994,8 @@ notificationTimeout, notification);
                 'click .toggle-filetransfer': 'toggleFiletransferMenuIfCorrectTarget',
                 'click .toggle-filetransfer .validation': 'proposeFiletransfer',
                 'click .chat-filetransfer-accept': 'acceptFiletransfer',
-                'click .chat-filetransfer-refuse': 'refuseFiletransfer'
+                'click .chat-filetransfer-refuse': 'refuseFiletransfer',
+                'click .chat-filetransfer-cancel': 'cancelFiletransfer'
             },
 
             initialize: function (){
@@ -1513,14 +1514,35 @@ notificationTimeout, notification);
                 this.showFiletransferNotification(message);
             },
 
+            cancelFiletransfer: function (ev) {
+                var fileReceiverJid = Strophe.getBareJidFromJid(this.model.get('jid')),
+                    message = __('Transfer cancelled.');
+
+                ev.preventDefault();
+                ev.stopPropagation();
+
+                this.sendFiletransferCancellation(fileReceiverJid);
+                this.removeFiletransferControls();
+                this.showFiletransferNotification(message);
+            },
+
             sendProposalResponse: function (fileSenderJid, approved) {
                 var data = {
-                    type: 'response',
-                    from: Strophe.getBareJidFromJid(converse.connection.jid),
-                    approved: approved
-                };
+                        type: 'response',
+                        from: Strophe.getBareJidFromJid(converse.connection.jid),
+                        approved: approved
+                    };
 
                 converse.peerTransferHandler.send(fileSenderJid, data);
+            },
+
+            sendFiletransferCancellation: function (fileReceiverJid) {
+                var data = {
+                        type: 'cancellation',
+                        from: Strophe.getBareJidFromJid(converse.connection.jid)
+                    };
+
+                converse.peerTransferHandler.send(fileReceiverJid, data);
             },
 
             onChange: function (item, changed) {
@@ -2680,19 +2702,26 @@ notificationTimeout, notification);
                     handler;
 
                 try {
+                    debugger;
                     converse.peerTransferHandler.on('proposal', function (transfer, data) {
-                        handler = self.onFileProposal.bind(self);
+                        handler = self.onFiletransferProposal.bind(self);
 
                         handler(transfer, data);
                     });
 
                     converse.peerTransferHandler.on('response', function (transfer, data) {
                         if (data.approved === true) {
-                            handler = self.onFileApproval.bind(self);
+                            handler = self.onFiletransferApproval.bind(self);
                         }
                         else {
-                            handler = self.onFileRefusal.bind(self);
+                            handler = self.onFiletransferRefusal.bind(self);
                         }
+
+                        handler(transfer, data);
+                    });
+
+                    converse.peerTransferHandler.on('cancellation', function (transfer, data) {
+                        handler = self.onFiletransferCancellation.bind(self);
 
                         handler(transfer, data);
                     });
@@ -2793,7 +2822,7 @@ notificationTimeout, notification);
                 return true;
             },
 
-            onFileProposal: function (transfer, data) {
+            onFiletransferProposal: function (transfer, data) {
                 try {
                     var chatBoxView = this.getChatBoxViewFromBuddyJid(data.from);
 
@@ -2824,7 +2853,7 @@ notificationTimeout, notification);
                 }
             },
 
-            onFileApproval: function (transfer, data) {
+            onFiletransferApproval: function (transfer, data) {
                 try {
                     var bareJid = Strophe.getBareJidFromJid(data.from),
                         file = transfer.file,
@@ -2854,7 +2883,28 @@ notificationTimeout, notification);
                 }
             },
 
-            onFileRefusal: function (transfer, data) {
+            onFiletransferRefusal: function (transfer, data) {
+                try {
+                    var chatBoxView = this.getChatBoxViewFromBuddyJid(data.from),
+                        file = transfer.file;
+
+                    if (chatBoxView && file) {
+                        var message = __(
+                            'Transfer of \"%1$s\" cancelled.',
+                            [file.name]
+                        );
+
+                        chatBoxView.removeFiletransferControls();
+                        chatBoxView.showFiletransferNotification(message);
+                    }
+                }
+                catch (e) {
+                    console.error(e);
+                }
+            },
+
+            onFiletransferCancellation: function (transfer, data) {
+                debugger;
                 try {
                     var chatBoxView = this.getChatBoxViewFromBuddyJid(data.from),
                         file = transfer.file;
