@@ -151,9 +151,6 @@
                     tag: (new Date).getTime()
                 });
 
-                console.log('notifying', notificationPermission,
-notificationTimeout, notification);
-
                 // `timeout` notification property not working on all browsers.
                 setTimeout(function () {
                     notification.close();
