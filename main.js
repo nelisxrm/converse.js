@@ -53,6 +53,7 @@ config = {
 
     // define module dependencies for modules not using define
     shim: {
+        'jquery':   { exports: 'jqueryConverse' },
         'backbone': {
             //These script dependencies should be loaded before loading
             //backbone.js
