@@ -1460,14 +1460,16 @@ notificationTimeout, notification);
                     controls;
 
                 converse.peerTransferHandler.send(remoteJid, data, function (transfer, data) {
-                    transfer.file = {
+                    var fileData = {
                         data: file,
                         name: file.name,
                         size: file.size,
                         type: file.type
                     };
 
-                    console.log('attached transfer', transfer);
+                    transfer.attachData('file', fileData);
+
+                    console.log('attached data to transfer', transfer, fileData);
                 });
 
                 message = __(
@@ -2702,7 +2704,6 @@ notificationTimeout, notification);
                     handler;
 
                 try {
-                    debugger;
                     converse.peerTransferHandler.on('proposal', function (transfer, data) {
                         handler = self.onFiletransferProposal.bind(self);
 
@@ -2856,7 +2857,7 @@ notificationTimeout, notification);
             onFiletransferApproval: function (transfer, data) {
                 try {
                     var bareJid = Strophe.getBareJidFromJid(data.from),
-                        file = transfer.file,
+                        file = transfer.getAttachedData('file'),
                         dataToSend = {
                             type: 'file',
                             from: Strophe.getBareJidFromJid(converse.connection.jid),
@@ -2886,7 +2887,7 @@ notificationTimeout, notification);
             onFiletransferRefusal: function (transfer, data) {
                 try {
                     var chatBoxView = this.getChatBoxViewFromBuddyJid(data.from),
-                        file = transfer.file;
+                        file = transfer.getAttachedData('file');
 
                     if (chatBoxView && file) {
                         var message = __(
@@ -2904,10 +2905,9 @@ notificationTimeout, notification);
             },
 
             onFiletransferCancellation: function (transfer, data) {
-                debugger;
                 try {
                     var chatBoxView = this.getChatBoxViewFromBuddyJid(data.from),
-                        file = transfer.file;
+                        file = transfer.getAttachedData('file');
 
                     if (chatBoxView && file) {
                         var message = __(
@@ -3001,7 +3001,7 @@ notificationTimeout, notification);
             onFileReceipt: function (transfer, data) {
                 try {
                     var chatBoxView = this.getChatBoxViewFromBuddyJid(data.from),
-                        file = transfer.file;
+                        file = transfer.getAttachedData('file');
 
                     if (chatBoxView && file) {
                         var message = __(
