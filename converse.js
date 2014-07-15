@@ -249,6 +249,7 @@
         this.xhr_custom_status_url = '';
         this.xhr_user_search = false;
         this.xhr_user_search_url = '';
+        this.peer_configuration = {};
 
         // Allow only whitelisted configuration attributes to be overwritten
         _.extend(this, _.pick(settings, [
@@ -287,7 +288,8 @@
             'xhr_custom_status',
             'xhr_custom_status_url',
             'xhr_user_search',
-            'xhr_user_search_url'
+            'xhr_user_search_url',
+            'peer_configuration'
         ]));
         if (settings.visible_toolbar_buttons) {
             _.extend(
@@ -4311,7 +4313,7 @@
             this.otr = new this.OTR();
 
             try {
-                this.peerTransferHandler = new PeerTransferHandler(Strophe.getBareJidFromJid(this.jid), {debug: true});
+                this.peerTransferHandler = new PeerTransferHandler(Strophe.getBareJidFromJid(this.jid), this.peer_configuration);
             }
             catch (e) {
                 this.peerTransferHandler = null;
