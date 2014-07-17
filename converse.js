@@ -28,7 +28,7 @@
         root.converse = factory(jQuery, _, OTR, DSA, JST, moment, filesize);
     }
 }(this, function ($, _, OTR, DSA, templates, moment, filesize) {
-    "use strict";
+    // "use strict";
 
     if (typeof console === "undefined" || typeof console.log === "undefined") {
         console = { log: function () {}, error: function () {} };
@@ -108,6 +108,7 @@
             if ($.browser.webkit) {
                 var conversejs = document.getElementById('conversejs');
                 conversejs.style.display = 'none';
+                conversejs.offsetHeight = conversejs.offsetHeight; // no need to store this anywhere, the reference is enough
                 conversejs.style.display = 'block';
             }
         },
