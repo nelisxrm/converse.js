@@ -372,13 +372,15 @@
             }
         };
 
-        this.log = function (txt, level) {
+        this.log = function () {
             if (this.debug) {
-                if (level == 'error') {
-                    console.log('ERROR: '+txt);
-                } else {
-                    console.log(txt);
-                }
+                console.log.apply(console, arguments);
+            }
+        };
+
+        this.logError = function (message) {
+            if (this.debug) {
+                console.error.apply(console, arguments);
             }
         };
 
@@ -1671,6 +1673,12 @@
                     } else if (data.otr_status == FINISHED){
                         data.otr_tooltip = __('Your buddy has closed their end of the private session, you should do the same');
                     }
+
+                    if (!converse.peerTransferHandler.util.supports.data) {
+                        converse.log('peer transfer not supported', converse.peerTransferHandler.util.browser);
+                        converse.allow_filetransfer = false;
+                    }
+
                     this.$el.find('.chat-toolbar').html(
                         converse.templates.toolbar(
                             _.extend(data, {
@@ -4306,17 +4314,17 @@
         });
 
         this._initialize = function () {
-            this.chatboxes = new this.ChatBoxes();
-            this.chatboxviews = new this.ChatBoxViews({model: this.chatboxes});
-            this.controlboxtoggle = new this.ControlBoxToggle();
-            this.otr = new this.OTR();
-
             try {
                 this.peerTransferHandler = new PeerTransferHandler(Strophe.getBareJidFromJid(this.jid), this.peer_configuration);
             }
             catch (e) {
                 this.peerTransferHandler = null;
             }
+
+            this.chatboxes = new this.ChatBoxes();
+            this.chatboxviews = new this.ChatBoxViews({model: this.chatboxes});
+            this.controlboxtoggle = new this.ControlBoxToggle();
+            this.otr = new this.OTR();
         };
 
         // Initialization
