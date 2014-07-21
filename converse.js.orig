@@ -108,7 +108,11 @@
             if ($.browser.webkit) {
                 var conversejs = document.getElementById('conversejs');
                 conversejs.style.display = 'none';
+<<<<<<< HEAD
+                conversejs.style.height = conversejs.offsetHeight; // no need to store this anywhere, the reference is enough
+=======
                 conversejs.style.height = conversejs.offsetHeight;
+>>>>>>> master
                 conversejs.style.display = 'block';
             }
         },
@@ -1296,9 +1300,7 @@
             },
 
             clearMessages: function (ev) {
-                if (ev && ev.preventDefault) {
-                    ev.preventDefault();
-                }
+                if (ev && ev.preventDefault) { ev.preventDefault(); }
                 var result = confirm(__("Are you sure you want to clear the messages from this chat box?"));
                 if (result === true) {
                     this.$el.find('.chat-content').empty();
@@ -2819,27 +2821,11 @@
                     buddy_jid = from;
                     resource = Strophe.getResourceFromJid(message_from);
                 }
-                chatbox = this.get(buddy_jid);
-                roster_item = converse.roster.get(buddy_jid);
 
                 chatbox = this.getChatBoxFromBuddyJid(buddy_jid);
-                if (roster_item === undefined) {
-                    // The buddy was likely removed
-                    converse.log('Could not get roster item for JID '+buddy_jid, 'error');
-                    return true;
-                }
 
                 if (!chatbox) {
-                    var fullname = roster_item.get('fullname');
-                    fullname = _.isEmpty(fullname)? buddy_jid: fullname;
-                    chatbox = this.create({
-                        'id': buddy_jid,
-                        'jid': buddy_jid,
-                        'fullname': fullname,
-                        'image_type': roster_item.get('image_type'),
-                        'image': roster_item.get('image'),
-                        'url': roster_item.get('url')
-                    });
+                    return true;
                 }
 
                 chatbox.receiveMessage($message);

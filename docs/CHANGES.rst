@@ -8,6 +8,7 @@ Changelog
     1. Converse.js is now relicensed under the `Mozilla Public License <http://www.mozilla.org/MPL/2.0/>`_.
     2. Configuration options for the chat toolbar have changed.
        Please refer to the `relevant documentation <http://devbox:8890/docs/html/index.html#visible-toolbar-buttons>`_.
+    3. This release drops support for IE8.
 
 * Events have been renamed to remove "on" prefix (which is redundant when used with 'on' method). [jcbrand]
 * Simplified Chinese Translations [Lancelot]
@@ -18,12 +19,16 @@ Changelog
 * Upgraded many dependencies to their latest versions. [jcbrand]
 * Add new configuration setting `forward_messages <https://conversejs.org/docs/html/index.html#forward_messages>`_
   Message forwarding was before a default behavior but is now optional (and disabled by default). [jcbrand]
-* Newly opened chat boxes always appear immediately left of the controlbox.
+* Newly opened chat boxes always appear immediately left of the controlbox. [jcbrand]
 * #71 Chat boxes and rooms can be minimized. [jcbrand]
+* #123 Show converse.js in the resource assigned to a user. [jcbrand]
 * #130 Fixed bootstrap conflicts. [jcbrand]
 * #132 Support for `XEP-0280: Message Carbons <https://xmpp.org/extensions/xep-0280.html'>`_.
-  Configured via `enable_message_carbons <https://conversejs.org/docs/html/index.html#enable_message_carbons>`_ [hejazee]
+  Configured via `message_carbons <https://conversejs.org/docs/html/index.html#message_carbons>`_ [hejazee]
 * #176 Add support for caching in sessionStorage as opposed to localStorage. [jcbrand]
+* #180 RID and SID undefined [g8g3]
+* #191 No messages history [heban]
+* #192 Error: xhr_user_search_url is not defined. [jcbrand]
 
 0.7.4 (2014-03-05)
 ------------------

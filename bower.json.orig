@@ -30,14 +30,17 @@
     "jquery.browser": "~0.0.6",
     "jquery-easing-original": "~1.3.1",
     "bootstrap": "~3.2.0",
+<<<<<<< HEAD
     "backbone.overview": "*",
     "peerjs": "~0.3.8",
     "PeerTransferHandler": "https://github.com/g8g3/PeerTransferHandler.git",
     "html5-desktop-notifications": "*",
     "filesize": "~2.0.3",
     "visibilityjs": "~1.2.1",
-    "SoundJS": "*",
+    "SoundJS": "*"
+=======
     "fontawesome": "~4.1.0"
+>>>>>>> master
   },
   "exportsOverride": {}
 }

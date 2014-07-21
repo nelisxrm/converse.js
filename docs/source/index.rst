@@ -384,6 +384,10 @@ notice that there are references to a missing *components* folder. Please
 follow the instructions below to create this folder and fetch Converse's
 3rd-party dependencies.
 
+.. Note:
+    Users have reported that converse.js cannot be built on Windows. Patches to
+    fix this are welcome.
+
 
 Install the development and front-end dependencies
 ==================================================
@@ -779,6 +783,8 @@ Here are the different events that are emitted:
 +----------------------------------+---------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------+
 | **chatBoxOpened**                | When a chat box has been opened.                                                                  | ``converse.on('chatBoxOpened', function (chatbox) { ... });``                           |
 +----------------------------------+---------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------+
+| **chatRoomOpened**               | When a chat room has been opened.                                                                 | ``converse.on('chatRoomOpened', function (chatbox) { ... });``                          |
++----------------------------------+---------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------+
 | **chatBoxClosed**                | When a chat box has been closed.                                                                  | ``converse.on('chatBoxClosed', function (chatbox) { ... });``                           |
 +----------------------------------+---------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------+
 | **chatBoxFocused**               | When the focus has been moved to a chat box.                                                      | ``converse.on('chatBoxFocused', function (chatbox) { ... });``                          |
@@ -918,7 +924,7 @@ Default:  ``false``
 
 If set to true, debugging output will be logged to the browser console.
 
-enable_message_carbons
+message_carbons
 ----------------------
 
 Default:  ``false``
