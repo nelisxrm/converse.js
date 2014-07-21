@@ -234,6 +234,7 @@
         this.no_trimming = false; // Set to true for phantomjs tests (where browser apparently has no width)
         this.notifications_duration = 8000; // In milliseconds.
         this.prebind = false;
+        this.ignore_controlbox_state = false;
         this.show_controlbox_by_default = false;
         this.show_only_online_users = false;
         this.show_toolbar = true;
@@ -278,6 +279,7 @@
             'jid',
             'prebind',
             'rid',
+            'ignore_controlbox_state',
             'show_controlbox_by_default',
             'show_only_online_users',
             'show_toolbar',
@@ -2784,7 +2786,7 @@
                     add: true,
                     success: $.proxy(function (collection, resp) {
                         if (_.include(_.pluck(resp, 'id'), 'controlbox')) {
-                            if (converse.show_controlbox_by_default) {
+                            if (converse.ignore_controlbox_state && converse.show_controlbox_by_default) {
                                 this.get('controlbox').trigger('show');
                             }
                         }
@@ -4375,7 +4377,7 @@
         } else if (this.connection) {
             this.onConnected();
         }
-        if (this.show_controlbox_by_default) { this.controlboxtoggle.showControlBox(); }
+        if (this.ignore_controlbox_state && this.show_controlbox_by_default) { this.controlboxtoggle.showControlBox(); }
         this.registerGlobalEventHandlers();
         converse.emit('initialized');
     };
