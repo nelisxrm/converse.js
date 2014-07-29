@@ -12,7 +12,7 @@
         define("converse",
               ["converse-dependencies", "converse-templates"],
             function(dependencies, templates) {
-                console.log('dependencies', dependencies);
+                converse.log('dependencies', dependencies);
                 var jQuery = dependencies.jQuery.noConflict(true),
                     otr = dependencies.otr,
                     moment = dependencies.moment,
@@ -118,8 +118,8 @@
                     ? Visibility.hidden()
                     : !document.hasFocus();
 
-                console.log(document.activeElement);
-                console.log('is page not focused?', isPageNotFocused);
+                converse.log(document.activeElement);
+                converse.log('is page not focused?', isPageNotFocused);
 
                 if (isPageNotFocused) {
                     converse.showDesktopNotification(title, message);
@@ -127,17 +127,17 @@
                 }
             }
             catch (e) {
-                console.error(e);
+                converse.logError(e);
             }
         },
         playSoundNotification: function () {
             try {
                 var sound = createjs.Sound.play('notification');
 
-                console.log('sound', sound);
+                converse.log('sound', sound);
             }
             catch (e) {
-                console.error(e);
+                converse.logError(e);
             }
         },
         showDesktopNotification: function (title, message) {
@@ -159,11 +159,11 @@
 
             try {
                 if (!notify.isSupported) {
-                    console.log('desktop notifications are not supported', notificationPermission);
+                    converse.log('desktop notifications are not supported', notificationPermission);
                     return;
                 }
 
-                console.log('desktop notification permission', notificationPermission);
+                converse.log('desktop notification permission', notificationPermission);
 
                 switch (notificationPermission) {
                     case notify.PERMISSION_DEFAULT:
@@ -179,7 +179,7 @@
                 }
             }
             catch (e) {
-                console.error(e);
+                converse.logError(e);
             }
         },
         getTruncatedTextWithEllipsis: function (text, length) {
@@ -382,7 +382,7 @@
 
         this.logError = function (message) {
             if (this.debug) {
-                console.error.apply(console, arguments);
+                converse.logError.apply(console, arguments);
             }
         };
 
@@ -652,11 +652,11 @@
 
         this.onConnected = function () {
             if (this.debug) {
-                this.connection.xmlInput = function (body) { console.log(body); };
-                this.connection.xmlOutput = function (body) { console.log(body); };
-                Strophe.log = function (level, msg) { console.log(level+' '+msg); };
+                this.connection.xmlInput = function (body) { converse.log(body); };
+                this.connection.xmlOutput = function (body) { converse.log(body); };
+                Strophe.log = function (level, msg) { converse.log(level+' '+msg); };
                 Strophe.error = function (msg) {
-                    console.log('ERROR: '+msg);
+                    converse.logError('ERROR: '+msg);
                 };
             }
             this.bare_jid = Strophe.getBareJidFromJid(this.connection.jid);
@@ -1347,7 +1347,7 @@
                 } else {
                     this.showHelpMessages(['Encryption error occured: '+msg], 'error');
                 }
-                console.log("OTR ERROR:"+msg);
+                converse.logError("OTR ERROR:"+msg);
             },
 
             buddyStartsOTR: function (ev) {
@@ -1428,23 +1428,23 @@
                     ev.stopPropagation();
 
                     input = $('.toggle-filetransfer .file');
-                    console.log('input', input);
+                    converse.log('input', input);
 
                     files = (input.length > 0) && input[0].files;
-                    console.log('files', files);
+                    converse.log('files', files);
 
                     if (!files || files.length === 0) {
-                        console.log('please select a file');
+                        converse.log('please select a file');
                         return;
                     }
 
                     file = files[0];
-                    console.log('file', file);
+                    converse.log('file', file);
 
                     this.sendFileProposal(file);
                 }
                 catch (e) {
-                    console.error(e);
+                    converse.logError(e);
                 }
             },
 
@@ -1471,7 +1471,7 @@
 
                     transfer.attachData('file', fileData);
 
-                    console.log('attached data to transfer', transfer, fileData);
+                    converse.log('attached data to transfer', transfer, fileData);
                 });
 
                 message = __(
@@ -2752,7 +2752,7 @@
                     });
                 }
                 catch (e) {
-                    console.error(e);
+                    converse.logError(e);
                 }
             },
 
@@ -2856,7 +2856,7 @@
                 try {
                     var chatBoxView = this.getChatBoxViewFromBuddyJid(data.from);
 
-                    console.log('chatBoxView', chatBoxView);
+                    converse.log('chatBoxView', chatBoxView);
 
                     if (chatBoxView) {
                         var contactName = chatBoxView.model.get('fullname'),
@@ -2879,7 +2879,7 @@
                     }
                 }
                 catch (e) {
-                    console.error(e);
+                    converse.logError(e);
                 }
             },
 
@@ -2909,7 +2909,7 @@
                     converse.peerTransferHandler.send(bareJid, dataToSend);
                 }
                 catch (e) {
-                    console.error(e);
+                    converse.logError(e);
                 }
             },
 
@@ -2929,7 +2929,7 @@
                     }
                 }
                 catch (e) {
-                    console.error(e);
+                    converse.logError(e);
                 }
             },
 
@@ -2949,7 +2949,7 @@
                     }
                 }
                 catch (e) {
-                    console.error(e);
+                    converse.logError(e);
                 }
             },
 
@@ -2961,7 +2961,7 @@
                     file = data.file;
                     file.id = (new Date).getTime();
 
-                    console.log('file id', file.id);
+                    converse.log('file id', file.id);
                 }
 
                 function performDownload () {
@@ -2993,7 +2993,7 @@
                     }
                 }
                 catch (e) {
-                    console.error(e);
+                    converse.logError(e);
                 }
             },
 
@@ -3043,7 +3043,7 @@
                     }
                 }
                 catch (e) {
-                    console.error(e);
+                    converse.logError(e);
                 }
             },
 
@@ -3073,7 +3073,7 @@
                     });
                 }
 
-                console.log('chatBox', chatBox);
+                converse.log('chatBox', chatBox);
 
                 return chatBox;
             },
@@ -3081,10 +3081,10 @@
             getChatBoxViewFromBuddyJid: function (buddyJid) {
                 var bareJid = Strophe.getBareJidFromJid(buddyJid),
                     chatBox = this.getChatBoxFromBuddyJid(bareJid);
-                    console.log('chatBox', chatBox);
+                    converse.log('chatBox', chatBox);
                 var chatBoxView = converse.chatboxviews.get(chatBox.id);
 
-                console.log('chatBoxView', chatBoxView);
+                converse.log('chatBoxView', chatBoxView);
 
                 return chatBoxView;
             }
