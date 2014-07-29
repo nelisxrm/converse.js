@@ -12,7 +12,6 @@
         define("converse",
               ["converse-dependencies", "converse-templates"],
             function(dependencies, templates) {
-                converse.log('dependencies', dependencies);
                 var jQuery = dependencies.jQuery.noConflict(true),
                     otr = dependencies.otr,
                     moment = dependencies.moment,
@@ -151,9 +150,11 @@
                     tag: (new Date).getTime()
                 });
 
+                converse.log('notification', notification);
+
                 // `timeout` notification property not working on all browsers.
                 setTimeout(function () {
-                    notification.close();
+                    converse.log.close();
                 }, notificationTimeout);
             }
 
