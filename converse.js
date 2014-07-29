@@ -154,7 +154,7 @@
 
                 // `timeout` notification property not working on all browsers.
                 setTimeout(function () {
-                    converse.log.close();
+                    notification.close();
                 }, notificationTimeout);
             }
 
