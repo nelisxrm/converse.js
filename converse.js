@@ -4049,7 +4049,7 @@
 
             events: {
                 "click a.choose-xmpp-status": "toggleOptions",
-                "click #fancy-xmpp-status-select a.change-xmpp-status-message": "renderStatusChangeForm",
+                // "click #fancy-xmpp-status-select a.change-xmpp-status-message": "renderStatusChangeForm",
                 "submit #set-custom-xmpp-status": "setStatusMessage",
                 "click .dropdown dd ul li a": "setStatus"
             },
