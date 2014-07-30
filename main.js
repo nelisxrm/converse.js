@@ -1,5 +1,6 @@
 config = {
     baseUrl: 'web/vendor/converse',
+    waitSeconds: 30,
     paths: {
         "jquery": "components/jquery/dist/jquery",
         "jquery.tinysort": "components/tinysort/src/jquery.tinysort",
