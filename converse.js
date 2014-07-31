@@ -383,7 +383,7 @@
 
         this.logError = function (message) {
             if (this.debug) {
-                converse.logError.apply(console, arguments);
+                console.error.apply(console, arguments);
             }
         };
 
@@ -1452,7 +1452,7 @@
             sendFileProposal: function (file) {
                 var remoteJid = Strophe.getBareJidFromJid(this.model.get('jid')),
                     fileReceiverFullName = this.model.get('fullname'),
-                    data = {
+                    dataToSend = {
                         type: 'proposal',
                         from: Strophe.getBareJidFromJid(converse.connection.jid),
                         fileName: file.name,
@@ -1462,7 +1462,7 @@
                     message,
                     controls;
 
-                converse.peerTransferHandler.send(remoteJid, data, function (transfer, data) {
+                converse.peerTransferHandler.send(remoteJid, dataToSend, function (transfer, data) {
                     transfer.set('file', {
                         data: file,
                         name: file.name,
@@ -1471,7 +1471,12 @@
                     });
 
                     transfer.set('progression', {
+                        started: true,
                         finished: false
+                    });
+
+                    transfer.set('contact', {
+                        id: remoteJid
                     });
                 });
 
@@ -1523,10 +1528,8 @@
                 var fileReceiverJid = Strophe.getBareJidFromJid(this.model.get('jid')),
                     message = __('Transfer cancelled.');
 
-                if (ev) {
-                    ev.preventDefault();
-                    ev.stopPropagation();
-                }
+                ev.preventDefault();
+                ev.stopPropagation();
 
                 this.sendFiletransferCancellation(fileReceiverJid);
                 this.removeFiletransferControls();
@@ -2833,7 +2836,6 @@
                 }
                 chatbox = this.get(buddy_jid);
                 roster_item = converse.roster.get(buddy_jid);
-
                 chatbox = this.getChatBoxFromBuddyJid(buddy_jid);
                 if (roster_item === undefined) {
                     // The buddy was likely removed
@@ -3058,14 +3060,30 @@
             },
 
             onPeerQuitting: function (transfer) {
-                var progression = transfer.get('progression');
+                try {
+                    var progression = transfer.get('progression');
 
-                converse.log('peer quitting', transfer);
-                transfer.close();
+                    converse.log('peer quitting', transfer);
+                    transfer.close();
 
-                if (progression && progression.finished === false) {
-                    this.cancelFiletransfer();
+                    if (progression && progression.started && progression.finished === false) {
+                        var chatBoxView = this.getChatBoxViewFromBuddyJid(transfer.get('contact').id);
+
+                        if (chatBoxView) {
+                            this.cancelCurrentFiletransfer(transfer, chatBoxView);
+                        }
+                    }
                 }
+                catch (e) {
+                    converse.logError(e);
+                }
+            },
+
+            cancelCurrentFiletransfer: function (transfer, chatBoxView) {
+                var message = __('Transfer cancelled.');
+
+                chatBoxView.removeFiletransferControls();
+                chatBoxView.showFiletransferNotification(message);
             },
 
             getChatBoxFromBuddyJid: function (buddyJid) {
@@ -3101,9 +3119,12 @@
 
             getChatBoxViewFromBuddyJid: function (buddyJid) {
                 var bareJid = Strophe.getBareJidFromJid(buddyJid),
-                    chatBox = this.getChatBoxFromBuddyJid(bareJid);
-                    converse.log('chatBox', chatBox);
-                var chatBoxView = converse.chatboxviews.get(chatBox.id);
+                    chatBox = this.getChatBoxFromBuddyJid(bareJid),
+                    chatBoxView = null;
+
+                if (chatBox) {
+                    chatBoxView = converse.chatboxviews.get(chatBox.id);
+                }
 
                 converse.log('chatBoxView', chatBoxView);
 
