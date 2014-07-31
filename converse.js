@@ -1462,7 +1462,7 @@
                     message,
                     controls;
 
-                converse.peerTransferHandler.send(remoteJid, dataToSend, function (transfer, data) {
+                converse.peerWrap.send(remoteJid, dataToSend, function (transfer, data) {
                     transfer.set('file', {
                         data: file,
                         name: file.name,
@@ -1543,7 +1543,7 @@
                         approved: approved
                     };
 
-                converse.peerTransferHandler.send(fileSenderJid, data);
+                converse.peerWrap.send(fileSenderJid, data);
             },
 
             sendFiletransferCancellation: function (fileReceiverJid) {
@@ -1552,7 +1552,7 @@
                         from: Strophe.getBareJidFromJid(converse.connection.jid)
                     };
 
-                converse.peerTransferHandler.send(fileReceiverJid, data);
+                converse.peerWrap.send(fileReceiverJid, data);
             },
 
             onChange: function (item, changed) {
@@ -1682,8 +1682,8 @@
                         data.otr_tooltip = __('Your buddy has closed their end of the private session, you should do the same');
                     }
 
-                    if (!converse.peerTransferHandler.util.supports.data) {
-                        converse.log('peer transfer not supported', converse.peerTransferHandler.util.browser);
+                    if (!converse.peerWrap.util.supports.data) {
+                        converse.log('peer transfer not supported', converse.peerWrap.util.browser);
                         converse.allow_filetransfer = false;
                     }
 
@@ -2719,17 +2719,17 @@
 
             registerPeerTransferHandler: function () {
                 var self = this,
-                    transferHandler = converse.peerTransferHandler,
+                    peerWrap = converse.peerWrap,
                     handler;
 
                 try {
-                    transferHandler.on('proposal', function (transfer, data) {
+                    peerWrap.on('proposal', function (transfer, data) {
                         handler = self.onFiletransferProposal.bind(self);
 
                         handler(transfer, data);
                     });
 
-                    transferHandler.on('response', function (transfer, data) {
+                    peerWrap.on('response', function (transfer, data) {
                         if (data.approved === true) {
                             handler = self.onFiletransferApproval.bind(self);
                         }
@@ -2740,25 +2740,25 @@
                         handler(transfer, data);
                     });
 
-                    transferHandler.on('cancellation', function (transfer, data) {
+                    peerWrap.on('cancellation', function (transfer, data) {
                         handler = self.onFiletransferCancellation.bind(self);
 
                         handler(transfer, data);
                     });
 
-                    transferHandler.on('file', function (transfer, data) {
+                    peerWrap.on('file', function (transfer, data) {
                         handler = self.onFileData.bind(self);
 
                         handler(transfer, data);
                     });
 
-                    transferHandler.on('receipt', function (transfer, data) {
+                    peerWrap.on('receipt', function (transfer, data) {
                         handler = self.onFileReceipt.bind(self);
 
                         handler(transfer, data);
                     });
 
-                    transferHandler.on(transferHandler.types.quit, function (transfer) {
+                    peerWrap.on(peerWrap.types.quit, function (transfer) {
                         handler = self.onPeerQuitting.bind(self);
 
                         handler(transfer);
@@ -2918,7 +2918,7 @@
                         chatBoxView.showFiletransferControls(loaderControl);
                     }
 
-                    converse.peerTransferHandler.send(bareJid, dataToSend);
+                    converse.peerWrap.send(bareJid, dataToSend);
                 }
                 catch (e) {
                     converse.logError(e);
@@ -2992,7 +2992,7 @@
                     chatBoxView.removeFiletransferNotifications();
                     chatBoxView.showFiletransferControls(savingControls);
 
-                    converse.peerTransferHandler.send(bareJid, dataToSend);
+                    converse.peerWrap.send(bareJid, dataToSend);
                 }
 
                 try {
@@ -4393,10 +4393,10 @@
 
         this._initialize = function () {
             try {
-                this.peerTransferHandler = new PeerTransferHandler(Strophe.getBareJidFromJid(this.jid), this.peer_configuration);
+                this.peerWrap = new PeerWrap(Strophe.getBareJidFromJid(this.jid), this.peer_configuration);
             }
             catch (e) {
-                this.peerTransferHandler = null;
+                this.peerWrap = null;
             }
 
             this.chatboxes = new this.ChatBoxes();

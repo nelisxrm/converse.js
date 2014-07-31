@@ -36,7 +36,7 @@ config = {
         "moment": "components/momentjs/moment",
         "otr": "components/otr/build/otr",
         "peer": "components/peerjs/peer",
-        "PeerTransferHandler": "components/PeerTransferHandler/PeerTransferHandler",
+        "peer-wrap": "components/peer-wrap/peer-wrap",
         "notify": "components/html5-desktop-notifications/desktop-notify",
         "filesize": "components/filesize/lib/filesize",
         "visibility": "components/visibilityjs/lib/visibility.core",
@@ -84,7 +84,7 @@ config = {
         'strophe.muc':          { deps: ['strophe', 'jquery'] },
         'strophe.roster':       { deps: ['strophe'] },
         'strophe.vcard':        { deps: ['strophe'] },
-        'PeerTransferHandler':        { deps: ['peer'] }
+        'peer-wrap':        { deps: ['peer'] }
     }
 };
 

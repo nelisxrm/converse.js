@@ -13,7 +13,7 @@ define("converse-dependencies", [
     "strophe.roster",
     "strophe.vcard",
     "strophe.disco",
-    "PeerTransferHandler",
+    "peer-wrap",
     "notify",
     "visibility",
     "sound"
