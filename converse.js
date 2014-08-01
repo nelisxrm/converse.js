@@ -9,22 +9,21 @@
 // AMD/global registrations
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
-        define("converse",
-              ["converse-dependencies", "converse-templates"],
-            function(dependencies, templates) {
-                var jQuery = dependencies.jQuery.noConflict(true),
+        define("converse", ["converse-dependencies", "converse-templates"], function(dependencies, templates) {
+                var jq = jQuery.noConflict(true),
                     otr = dependencies.otr,
                     moment = dependencies.moment,
                     filesize = dependencies.filesize;
+
                 if (typeof otr !== "undefined") {
-                    return factory(jQuery, _, otr.OTR, otr.DSA, templates, moment, filesize);
+                    return factory(jq, _, otr.OTR, otr.DSA, templates, moment, filesize);
                 } else {
-                    return factory(jQuery, _, undefined, undefined, templates, moment, filesize);
+                    return factory(jq, _, undefined, undefined, templates, moment, filesize);
                 }
             }
         );
     } else {
-        root.converse = factory(jQuery, _, OTR, DSA, JST, moment, filesize);
+        root.converse = factory(jq, _, OTR, DSA, JST, moment, filesize);
     }
 }(this, function ($, _, OTR, DSA, templates, moment, filesize) {
     "use strict";

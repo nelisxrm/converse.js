@@ -1,6 +1,6 @@
 config = {
     baseUrl: 'web/vendor/converse',
-    waitSeconds: 30,
+    waitSeconds: 20,
     paths: {
         "jquery": "components/jquery/dist/jquery",
         "jquery.tinysort": "components/tinysort/src/jquery.tinysort",
@@ -52,18 +52,9 @@ config = {
         }
     },
 
-    // define module dependencies for modules not using define
     shim: {
-        'jquery':   { exports: 'jqueryConverse' },
         'backbone': {
-            //These script dependencies should be loaded before loading
-            //backbone.js
-            deps: [
-                'underscore',
-                'jquery'
-                ],
-            //Once loaded, use the global 'Backbone' as the
-            //module value.
+            deps: ['underscore', 'jquery'],
             exports: 'Backbone'
         },
         'underscore':           { exports: '_' },
@@ -84,13 +75,13 @@ config = {
         'strophe.muc':          { deps: ['strophe', 'jquery'] },
         'strophe.roster':       { deps: ['strophe'] },
         'strophe.vcard':        { deps: ['strophe'] },
-        'peer-wrap':        { deps: ['peer'] }
+        'peer-wrap':            { deps: ['peer'] }
     }
 };
 
-if (typeof(require) !== 'undefined') {
+if ('function' === typeof require) {
     require.config(config);
-    require(["converse"], function(converse) {
+    require(['converse'], function (converse) {
         window.converse = converse;
     });
 }
