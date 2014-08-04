@@ -4434,6 +4434,18 @@
             }
             return null;
         },
+        'showChatBox': function (contact) {
+            var attributes = {
+                    id: contact.id,
+                    jid: contact.id,
+                    fullname: contact.name,
+                    image: '',
+                    image_type: '',
+                    status: '',
+                    url: ''
+                };
+            converse.chatboxviews.showChat(attributes);
+        },
         'once': function(evt, handler) {
             converse.once(evt, handler);
         },
