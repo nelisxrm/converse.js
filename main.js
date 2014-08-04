@@ -36,7 +36,7 @@ config = {
         "moment": "components/momentjs/moment",
         "otr": "components/otr/build/otr",
         "peer": "components/peerjs/peer",
-        "peer-wrap": "components/peer-wrap/peer-wrap",
+        "peer-wrap": "components/peer-wrap/PeerWrap",
         "notify": "components/html5-desktop-notifications/desktop-notify",
         "filesize": "components/filesize/lib/filesize",
         "visibility": "components/visibilityjs/lib/visibility.core",
