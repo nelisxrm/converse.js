@@ -1452,7 +1452,6 @@
                 var remoteJid = Strophe.getBareJidFromJid(this.model.get('jid')),
                     fileReceiverFullName = this.model.get('fullname'),
                     dataToSend = {
-                        type: 'proposal',
                         from: Strophe.getBareJidFromJid(converse.connection.jid),
                         fileName: file.name,
                         fileSize: file.size,
@@ -1461,7 +1460,7 @@
                     message,
                     controls;
 
-                converse.peerWrap.send(remoteJid, dataToSend, function (transfer, data) {
+                converse.peerWrap.send(remoteJid, 'proposal', dataToSend, function (transfer, data) {
                     transfer.set('file', {
                         data: file,
                         name: file.name,
@@ -1537,21 +1536,19 @@
 
             sendProposalResponse: function (fileSenderJid, approved) {
                 var data = {
-                        type: 'response',
                         from: Strophe.getBareJidFromJid(converse.connection.jid),
                         approved: approved
                     };
 
-                converse.peerWrap.send(fileSenderJid, data);
+                converse.peerWrap.send(fileSenderJid, 'response', data);
             },
 
             sendFiletransferCancellation: function (fileReceiverJid) {
                 var data = {
-                        type: 'cancellation',
                         from: Strophe.getBareJidFromJid(converse.connection.jid)
                     };
 
-                converse.peerWrap.send(fileReceiverJid, data);
+                converse.peerWrap.send(fileReceiverJid, 'cancellation', data);
             },
 
             onChange: function (item, changed) {
@@ -2757,8 +2754,8 @@
                         handler(transfer, data);
                     });
 
-                    peerWrap.on(peerWrap.types.quit, function (transfer) {
-                        handler = self.onPeerQuitting.bind(self);
+                    peerWrap.on(peerWrap.types.remotePeerLeaving, function (transfer) {
+                        handler = self.onPeerLeaving.bind(self);
 
                         handler(transfer);
                     });
@@ -2899,7 +2896,6 @@
                     var bareJid = Strophe.getBareJidFromJid(data.from),
                         file = transfer.get('file'),
                         dataToSend = {
-                            type: 'file',
                             from: Strophe.getBareJidFromJid(converse.connection.jid),
                             file: file
                         },
@@ -2917,7 +2913,7 @@
                         chatBoxView.showFiletransferControls(loaderControl);
                     }
 
-                    converse.peerWrap.send(bareJid, dataToSend);
+                    converse.peerWrap.send(bareJid, 'file', dataToSend);
                 }
                 catch (e) {
                     converse.logError(e);
@@ -2984,14 +2980,13 @@
                             );
 
                     dataToSend = {
-                        type: 'receipt',
                         from: Strophe.getBareJidFromJid(converse.connection.jid)
                     };
 
                     chatBoxView.removeFiletransferNotifications();
                     chatBoxView.showFiletransferControls(savingControls);
 
-                    converse.peerWrap.send(bareJid, dataToSend);
+                    converse.peerWrap.send(bareJid, 'receipt', dataToSend);
                 }
 
                 try {
@@ -3058,7 +3053,7 @@
                 }
             },
 
-            onPeerQuitting: function (transfer) {
+            onPeerLeaving: function (transfer) {
                 try {
                     var progression = transfer.get('progression');
 
