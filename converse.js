@@ -380,7 +380,7 @@
             }
         };
 
-        this.logError = function (message) {
+        this.logError = function () {
             if (this.debug) {
                 console.error.apply(console, arguments);
             }
@@ -1552,6 +1552,7 @@
             },
 
             onChange: function (item, changed) {
+                    debugger;
                 if (_.has(item.changed, 'chat_status')) {
                     var chat_status = item.get('chat_status'),
                         fullname = item.get('fullname');
