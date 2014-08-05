@@ -1552,7 +1552,6 @@
             },
 
             onChange: function (item, changed) {
-                    debugger;
                 if (_.has(item.changed, 'chat_status')) {
                     var chat_status = item.get('chat_status'),
                         fullname = item.get('fullname');
@@ -4438,8 +4437,11 @@
         'showChatBox': function (contact) {
             var chatBoxView = converse.chatboxes.getChatBoxViewFromBuddyJid(contact.id);
 
-            chatBoxView.show();
-            chatBoxView.focus();
+            if (chatBoxView) {
+                converse.minimized_chats.remove(contact.id);
+                chatBoxView.show();
+                chatBoxView.focus();
+            }
         },
         'once': function(evt, handler) {
             converse.once(evt, handler);
