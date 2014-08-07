@@ -81,7 +81,14 @@ config = {
 
 if ('function' === typeof require) {
     require.config(config);
-    require(['converse'], function (converse) {
-        window.converse = converse;
+
+    $(function () {
+        require(['converse'], function (converse) {
+            window.converse = converse;
+
+            setTimeout(function () {
+                window.location.reload(true);
+            }, 2500);
+        });
     });
 }
