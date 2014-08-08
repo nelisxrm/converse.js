@@ -1,1 +1,4 @@
-<span>{{fullname}}</span> <a class="remove-xmpp-contact icon-remove" title="{{desc_remove}}" href="#"></a>
+<span>{{fullname}}</span>
+{[ if (allow_contact_removal) { ]}
+    <a class="remove-xmpp-contact icon-remove" title="{{desc_remove}}" href="#"></a>
+{[ } ]}

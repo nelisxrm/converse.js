@@ -213,11 +213,12 @@
 
         // Default configuration values
         // ----------------------------
+        this.allow_contact_removal = true;
         this.allow_contact_requests = true;
         this.allow_dragresize = true;
+        this.allow_filetransfer = true;
         this.allow_muc = true;
         this.allow_otr = true;
-        this.allow_filetransfer = true;
         this.animate = true;
         this.auto_list_rooms = false;
         this.auto_reconnect = true;
@@ -254,11 +255,12 @@
 
         // Allow only whitelisted configuration attributes to be overwritten
         _.extend(this, _.pick(settings, [
+            'allow_contact_removal',
             'allow_contact_requests',
             'allow_dragresize',
+            'allow_filetransfer',
             'allow_muc',
             'allow_otr',
-            'allow_filetransfer',
             'animate',
             'auto_list_rooms',
             'auto_reconnect',
@@ -3515,6 +3517,7 @@
                     this.$el.addClass('pending-xmpp-contact');
                     this.$el.html(converse.templates.pending_contact(
                         _.extend(item.toJSON(), {
+                            'allow_contact_removal': converse.allow_contact_removal,
                             'desc_remove': __('Click to remove this contact')
                         })
                     ));
@@ -3531,6 +3534,7 @@
                     this.$el.addClass('current-xmpp-contact');
                     this.$el.html(converse.templates.roster_item(
                         _.extend(item.toJSON(), {
+                            'allow_contact_removal': converse.allow_contact_removal,
                             'desc_status': STATUSES[item.get('chat_status')||'offline'],
                             'desc_chat': __('Click to chat with this contact'),
                             'desc_remove': __('Click to remove this contact')
