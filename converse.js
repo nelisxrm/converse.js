@@ -2886,6 +2886,7 @@
                             __('%1$s wants to send you a file', [contactName]),
                             __('"%1$s" (%2$s)', [fileName, info])
                         );
+                        converse.incrementMsgCounter();
                     }
                 }
                 catch (e) {
