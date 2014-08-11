@@ -11,11 +11,14 @@
     <link type="text/css" rel="stylesheet" media="screen" href="components/bootstrap/dist/css/bootstrap.min.css" />
     <link type="text/css" rel="stylesheet" media="screen" href="components/fontawesome/css/font-awesome.min.css" />
     <link type="text/css" rel="stylesheet" media="screen" href="css/theme.css" />
-    <link type="text/css" rel="stylesheet" media="screen" href="css/converse.css" />
-    <script data-main="main" src="components/requirejs/require.js"></script>
-    <!--
-    <script src="builds/converse.website.min.js"></script>
-    -->
+    <link type="text/css" rel="stylesheet" media="screen" href="css/converse.min.css" />
+    <!-- Only for development: <script data-main="main" src="components/requirejs/require.js"></script> -->
+    <![if gte IE 9]>
+        <script src="builds/converse.website.min.js"></script>
+    <![endif]>
+    <!--[if lt IE 9]>
+        <script src="builds/converse.website-no-otr.min.js"></script>
+    <![endif]-->
 </head>
 
 <body id="page-top" data-spy="scroll" data-target=".navbar-custom">
@@ -44,9 +47,11 @@
                     <li class="page-scroll">
                         <a href="#features">Features</a>
                     </li>
+                    <!--
                     <li class="page-scroll">
                         <a href="#donate">Donate</a>
                     </li>
+                    -->
                     <li class="page-scroll">
                         <a href="#contact">Contact</a>
                     </li>
@@ -69,7 +74,7 @@
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2">
                         <h1 class="brand-heading">Converse.js</h1>
-                        <p class="intro-text">An XMPP/Jabber webchat client for your website</p>
+                        <p class="intro-text">A free and open-source XMPP chat client for your website</p>
                         <div class="page-scroll">
                             <a href="#about" class="btn btn-default btn-lg">Learn More</a>
                         </div>
@@ -92,7 +97,7 @@
     <section id="about" class="container content-section text-center">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2">
-                <h2><strong>Converse.js</strong> is a free and open source chat client that runs in your browser and can be integrated into any website.</h3>
+                <h2><strong>Converse.js</strong> is a free and open source chat client that runs in your browser. It can be integrated into any website.</h3>
                 <p>Similar to <a href="https://www.facebook.com/sitetour/chat.php" target="_blank">Facebook chat</a> but it also supports multi-user chatrooms.</p>
                 <p>
                     <strong>Converse.js</strong> can connect to any accessible <a href="http://xmpp.org" target="_blank">XMPP/Jabber</a> server,
@@ -135,7 +140,7 @@
                             <li>Multi-user chatrooms (<a href="http://xmpp.org/extensions/xep-0045.html" target="_blank">XEP 45</a>)</li>
                             <li>vCard support (<a href="http://xmpp.org/extensions/xep-0054.html" target="_blank">XEP 54</a>)</li>
                             <li>Service discovery (<a href="http://xmpp.org/extensions/xep-0030.html" target="_blank">XEP 30</a>)</li>
-                            <li>Contact rosters</li>
+                            <li>Contact rosters and groups</li>
                             <li>Contact subscriptions</li>
                             <li>Accept or decline contact requests</li>
                             <li>Roster item exchange (<a href="http://xmpp.org/extensions/tmp/xep-0144-1.1.html" target="_blank">XEP 144</a>)</li>
@@ -143,7 +148,7 @@
                             <li>Custom status messages</li>
                             <li>Typing notifications</li>
                             <li>Third person messages (/me )</li>
-                            <li>Translated into 13 languages</li>
+                            <li>Translated into 14 languages</li>
                             <li>Off-the-record encryption
                         </ul>
                 </div>
@@ -176,6 +181,7 @@
         </div>
     </section>
 
+    <!--
     <section id="donate" class="donate-section content-section text-center">
         <div class="container">
             <div class="row">
@@ -190,6 +196,7 @@
             </div>
         </div>
     </section>
+    -->
 
     <section class="outro content-section" id="contact">
         <div class="intro-body">
@@ -223,16 +230,18 @@
 <script>
     require(['converse'], function (converse) {
         converse.initialize({
+            auto_reconnect: false,  // This feature still seems buggy
             allow_otr: true,
             auto_list_rooms: false,
             auto_subscribe: false,
-            bosh_service_url: 'http://192.168.56.2:8890/http-bind', // Please use this connection manager only for testing purposes
+            bosh_service_url: 'https://bind.conversejs.org', // Please use this connection manager only for testing purposes
             debug: true ,
             hide_muc_server: false,
             i18n: locales['en'], // Refer to ./locale/locales.js to see which locales are supported
             prebind: false,
             show_controlbox_by_default: true,
             xhr_user_search: false,
+            roster_groups: true
         });
     });
 </script>

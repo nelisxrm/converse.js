@@ -11,7 +11,7 @@ ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) ./d
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) ./docs/source
 
-.PHONY: all help clean html epub changes linkcheck gettext po pot po2json merge release css minjs
+.PHONY: all help clean html epub changes linkcheck gettext po pot po2json merge release css minjs build
 
 all: dev
 
@@ -45,7 +45,7 @@ po2json:
 ########################################################################
 ## Release management
 
-jsmin: 
+jsmin:
 	./node_modules/requirejs/bin/r.js -o src/build.js && ./node_modules/requirejs/bin/r.js -o src/build-no-locales-no-otr.js && ./node_modules/requirejs/bin/r.js -o src/build-no-otr.js && ./node_modules/requirejs/bin/r.js -o src/build-website.js
 
 cssmin:
@@ -59,7 +59,7 @@ release:
 	sed -i s/version\ =\ \'[0-9]\.[0-9]\.[0-9]\'/version\ =\ \'$(VERSION)\'/ docs/source/conf.py
 	sed -i s/release\ =\ \'[0-9]\.[0-9]\.[0-9]\'/release\ =\ \'$(VERSION)\'/ docs/source/conf.py
 	sed -i "s/(Unreleased)/(`date +%Y-%m-%d`)/" docs/CHANGES.rst
-	grunt minify
+	make build
 
 ########################################################################
 ## Install dependencies
@@ -86,6 +86,9 @@ dev: clean
 css::
 	./node_modules/.bin/lessc less/styles.less > css/theme.css
 	./node_modules/.bin/lessc less/converse.less > css/converse.css
+
+build::
+	./node_modules/.bin/grunt minify
 
 ########################################################################
 ## Tests
