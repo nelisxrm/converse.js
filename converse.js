@@ -1680,7 +1680,7 @@
                         data.otr_tooltip = __('Your buddy has closed their end of the private session, you should do the same');
                     }
 
-                    if (!converse.peerWrap.util.supports.data) {
+                    if (!converse.peerWrap.isConnected() || !converse.peerWrap.util.supports.data) {
                         converse.log('peer transfer not supported', converse.peerWrap.util.browser);
                         converse.allow_filetransfer = false;
                     }
@@ -2756,7 +2756,7 @@
                         handler(transfer, data);
                     });
 
-                    peerWrap.on(peerWrap.types.remotePeerLeaving, function (transfer) {
+                    peerWrap.on(peerWrap.types.remotePeerDisconnected, function (transfer) {
                         handler = self.onPeerLeaving.bind(self);
 
                         handler(transfer);
@@ -3248,6 +3248,10 @@
                     });
                 }
                 return chatbox;
+            },
+
+            removeFiletransferToolbarControl: function () {
+                $('.chat-toolbar .toggle-filetransfer').remove();
             }
         });
 
@@ -4391,17 +4395,19 @@
         });
 
         this._initialize = function () {
-            try {
-                this.peerWrap = new PeerWrap(Strophe.getBareJidFromJid(this.jid), this.peer_configuration);
-            }
-            catch (e) {
-                this.peerWrap = null;
-            }
+            var self = this;
+
+            this.peerWrap = new PeerWrap(Strophe.getBareJidFromJid(this.jid), this.peer_configuration);
 
             this.chatboxes = new this.ChatBoxes();
             this.chatboxviews = new this.ChatBoxViews({model: this.chatboxes});
             this.controlboxtoggle = new this.ControlBoxToggle();
             this.otr = new this.OTR();
+
+            this.peerWrap.on(this.peerWrap.types.peerDisconnected, function () {
+                converse.log('Peer not connected.');
+                self.chatboxviews.removeFiletransferToolbarControl();
+            });
         };
 
         // Initialization
