@@ -1082,7 +1082,7 @@
                 chatContent.find('.' + notificationsClassName + ':not(.chat-keep)').remove();
             },
 
-            showFiletransferControls: function (controls) {
+            showFiletransferMessageControls: function (controls) {
                 var chatContent = this.$el.find('.chat-content'),
                     controlsClassName = 'chat-filetransfer-controls';
 
@@ -1090,11 +1090,11 @@
                     controls.addClass(controlsClassName)
                 }
 
-                this.removeFiletransferControls();
+                this.removeFiletransferMessageControls();
                 chatContent.append(controls);
             },
 
-            removeFiletransferControls: function () {
+            removeFiletransferMessageControls: function () {
                 var chatContent = this.$el.find('.chat-content'),
                     controlsClassName = 'chat-filetransfer-controls';
 
@@ -1492,7 +1492,7 @@
 
                 this.toggleFiletransferMenu();
                 this.showFiletransferNotification(message);
-                this.showFiletransferControls(controls);
+                this.showFiletransferMessageControls(controls);
             },
 
             acceptFiletransfer: function (ev) {
@@ -1505,9 +1505,9 @@
                 ev.stopPropagation();
 
                 this.sendProposalResponse(fileSenderJid, isApproved);
-                this.removeFiletransferControls();
+                this.removeFiletransferMessageControls();
                 this.showFiletransferNotification(message);
-                this.showFiletransferControls(loaderControl);
+                this.showFiletransferMessageControls(loaderControl);
             },
 
             refuseFiletransfer: function (ev) {
@@ -1519,7 +1519,7 @@
                 ev.stopPropagation();
 
                 this.sendProposalResponse(fileSenderJid, isApproved);
-                this.removeFiletransferControls();
+                this.removeFiletransferMessageControls();
                 this.showFiletransferNotification(message);
             },
 
@@ -1531,7 +1531,7 @@
                 ev.stopPropagation();
 
                 this.sendFiletransferCancellation(fileReceiverJid);
-                this.removeFiletransferControls();
+                this.removeFiletransferMessageControls();
                 this.showFiletransferNotification(message);
             },
 
@@ -1568,6 +1568,9 @@
                             this.$el.find('div.chat-event').remove();
                         }
                     }
+
+                    this.renderToolbar();
+
                     converse.emit('buddyStatusChanged', item.attributes, item.get('chat_status'));
                 }
                 if (_.has(item.changed, 'status')) {
@@ -2903,7 +2906,7 @@
                         chatBoxView.showFiletransferNotification(
                             __('%1$s wants to send file "%2$s" (%3$s).', [contactName, fileName, info])
                         );
-                        chatBoxView.showFiletransferControls(
+                        chatBoxView.showFiletransferMessageControls(
                             controls
                         );
                         converse.notifyIfNotFocused(
@@ -2935,9 +2938,9 @@
                             ),
                             loaderControl = $('<span class="spinner"/>');
 
-                        chatBoxView.removeFiletransferControls();
+                        chatBoxView.removeFiletransferMessageControls();
                         chatBoxView.showFiletransferNotification(message);
-                        chatBoxView.showFiletransferControls(loaderControl);
+                        chatBoxView.showFiletransferMessageControls(loaderControl);
                     }
 
                     converse.peerWrap.send(bareJid, 'file', dataToSend);
@@ -2958,7 +2961,7 @@
                             [file.name]
                         );
 
-                        chatBoxView.removeFiletransferControls();
+                        chatBoxView.removeFiletransferMessageControls();
                         chatBoxView.showFiletransferNotification(message);
                     }
                 }
@@ -2978,7 +2981,7 @@
                             [file.name]
                         );
 
-                        chatBoxView.removeFiletransferControls();
+                        chatBoxView.removeFiletransferMessageControls();
                         chatBoxView.showFiletransferNotification(message);
                     }
                 }
@@ -3011,7 +3014,7 @@
                     };
 
                     chatBoxView.removeFiletransferNotifications();
-                    chatBoxView.showFiletransferControls(savingControls);
+                    chatBoxView.showFiletransferMessageControls(savingControls);
 
                     converse.peerWrap.send(bareJid, 'receipt', dataToSend);
                 }
@@ -3072,7 +3075,7 @@
                         );
 
                         chatBoxView.showFiletransferNotification(message);
-                        chatBoxView.removeFiletransferControls();
+                        chatBoxView.removeFiletransferMessageControls();
                     }
                 }
                 catch (e) {
@@ -3092,6 +3095,7 @@
 
                         if (chatBoxView) {
                             this.cancelCurrentFiletransfer(transfer, chatBoxView);
+                            chatBoxView.$el.find('.toggle-filetransfer')
                         }
                     }
                 }
@@ -3103,7 +3107,8 @@
             cancelCurrentFiletransfer: function (transfer, chatBoxView) {
                 var message = __('Transfer cancelled.');
 
-                chatBoxView.removeFiletransferControls();
+                chatBoxView.removeFiletransferMessageControls();
+                chatBoxView.removeFiletransferToolbarControls();
                 chatBoxView.showFiletransferNotification(message);
             },
 
@@ -3274,8 +3279,8 @@
                 return chatbox;
             },
 
-            removeFiletransferToolbarControl: function () {
-                $('.chat-toolbar .toggle-filetransfer').remove();
+            removeFiletransferToolbarControls: function () {
+                this.$el.find('.chat-toolbar .toggle-filetransfer').remove();
             }
         });
 
@@ -4587,16 +4592,10 @@
             var self = this;
 
             this.peerWrap = new PeerWrap(Strophe.getBareJidFromJid(this.jid), this.peer_configuration);
-
             this.chatboxes = new this.ChatBoxes();
             this.chatboxviews = new this.ChatBoxViews({model: this.chatboxes});
             this.controlboxtoggle = new this.ControlBoxToggle();
             this.otr = new this.OTR();
-
-            this.peerWrap.on(this.peerWrap.types.peerDisconnected, function () {
-                converse.log('Peer not connected.');
-                self.chatboxviews.removeFiletransferToolbarControl();
-            });
         };
 
         // Initialization
