@@ -140,7 +140,7 @@ msgstr "Voulez-vous effacer les messages de ce salon ?"
 
 #: converse.js:1121
 msgid "me"
-msgstr ""
+msgstr "moi"
 
 #: converse.js:1169
 msgid "%1$s is typing"

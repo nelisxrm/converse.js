@@ -931,7 +931,7 @@
                         time = moment().format();
                     }
                     if (from == converse.bare_jid) {
-                        sender = 'me';
+                        sender = __('me');
                     } else {
                         sender = 'them';
                     }
