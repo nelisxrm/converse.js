@@ -247,12 +247,14 @@
         this.message_carbons = false;
         this.no_trimming = false; // Set to true for phantomjs tests (where browser apparently has no width)
         this.notifications_duration = 8000; // In milliseconds.
+        this.peer_configuration = {};
         this.prebind = false;
-	this.roster_groups = false;
+        this.roster_groups = false;
         this.show_controlbox_by_default = false;
         this.show_only_online_users = false;
         this.show_toolbar = true;
         this.storage = 'session';
+        this.time_format = undefined;
         this.use_otr_by_default = false;
         this.use_vcards = true;
         this.visible_toolbar_buttons = {
@@ -264,7 +266,6 @@
         this.xhr_custom_status_url = '';
         this.xhr_user_search = false;
         this.xhr_user_search_url = '';
-        this.peer_configuration = {};
 
         // Allow only whitelisted configuration attributes to be overwritten
         _.extend(this, _.pick(settings, [
@@ -293,21 +294,22 @@
             'notifications_duration',
             'jid',
             'no_trimming',
+            'peer_configuration',
             'prebind',
             'rid',
-	    'roster_groups',
+            'roster_groups',
             'show_controlbox_by_default',
             'show_only_online_users',
             'show_toolbar',
             'sid',
             'storage',
+            'time_format',
             'use_otr_by_default',
             'use_vcards',
             'xhr_custom_status',
             'xhr_custom_status_url',
             'xhr_user_search',
-            'xhr_user_search_url',
-            'peer_configuration'
+            'xhr_user_search_url'
         ]));
         if (settings.visible_toolbar_buttons) {
             _.extend(
@@ -1129,7 +1131,7 @@
                 $content.find('div.chat-event').remove();
                 var message = template({
                     'sender': msg_dict.sender,
-                    'time': msg_time.format('hh:mm'),
+                    'time': msg_time.format(converse.time_format),
                     'username': username,
                     'message': '',
                     'extra_classes': msg_dict.delayed && 'delayed' || ''
