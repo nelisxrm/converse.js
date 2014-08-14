@@ -1686,63 +1686,42 @@
                         data.otr_tooltip = __('Your buddy has closed their end of the private session, you should do the same');
                     }
 
-                    this.setFiletransferAuthorization(function () {
-                        self.$el.find('.chat-toolbar').html(
-                            converse.templates.toolbar(
-                                _.extend(data, {
-                                    FINISHED: FINISHED,
-                                    UNENCRYPTED: UNENCRYPTED,
-                                    UNVERIFIED: UNVERIFIED,
-                                    VERIFIED: VERIFIED,
-                                    allow_otr: converse.allow_otr && !self.is_chatroom,
-                                    allow_filetransfer: self.model.get('allow_filetransfer'),
-                                    label_end_encrypted_conversation: __('End encrypted conversation'),
-                                    label_refresh_encrypted_conversation: __('Refresh encrypted conversation'),
-                                    label_start_encrypted_conversation: __('Start encrypted conversation'),
-                                    label_verify_with_fingerprints: __('Verify with fingerprints'),
-                                    label_verify_with_smp: __('Verify with SMP'),
-                                    label_whats_this: __("What\'s this?"),
-                                    otr_status_class: OTR_CLASS_MAPPING[data.otr_status],
-                                    otr_translated_status: OTR_TRANSLATED_MAPPING[data.otr_status],
-                                    show_call_button: converse.visible_toolbar_buttons.call,
-                                    show_clear_button: converse.visible_toolbar_buttons.clear,
-                                    show_emoticons: converse.visible_toolbar_buttons.emoticons,
-                                    smiley_button_title: __('Insert a smiley'),
-                                    filetransfer_button_title: __('Transfer a file'),
-                                    filetransfer_send_button: __('Send'),
-                                    clear_button_title: __('Clear all messages')
-                                })
-                            )
-                        );
-                    });
+                    self.model.set('allow_filetransfer', this.isFiletransferSupported());
+
+                    this.$el.find('.chat-toolbar').html(
+                        converse.templates.toolbar(
+                            _.extend(data, {
+                                FINISHED: FINISHED,
+                                UNENCRYPTED: UNENCRYPTED,
+                                UNVERIFIED: UNVERIFIED,
+                                VERIFIED: VERIFIED,
+                                allow_otr: converse.allow_otr && !this.is_chatroom,
+                                allow_filetransfer: this.model.get('allow_filetransfer'),
+                                label_end_encrypted_conversation: __('End encrypted conversation'),
+                                label_refresh_encrypted_conversation: __('Refresh encrypted conversation'),
+                                label_start_encrypted_conversation: __('Start encrypted conversation'),
+                                label_verify_with_fingerprints: __('Verify with fingerprints'),
+                                label_verify_with_smp: __('Verify with SMP'),
+                                label_whats_this: __("What\'s this?"),
+                                otr_status_class: OTR_CLASS_MAPPING[data.otr_status],
+                                otr_translated_status: OTR_TRANSLATED_MAPPING[data.otr_status],
+                                show_call_button: converse.visible_toolbar_buttons.call,
+                                show_clear_button: converse.visible_toolbar_buttons.clear,
+                                show_emoticons: converse.visible_toolbar_buttons.emoticons,
+                                smiley_button_title: __('Insert a smiley'),
+                                filetransfer_button_title: __('Transfer a file'),
+                                filetransfer_send_button: __('Send'),
+                                clear_button_title: __('Clear all messages')
+                            })
+                        )
+                    );
 
                 }
                 return this;
             },
 
-            setFiletransferAuthorization: function (callback) {
-                var jid, cb,
-                    self = this;
-
-                if (converse.allow_filetransfer  && !this.is_chatroom) {
-                    jid = this.model.get('jid'),
-                    cb = function (allow) {
-                        self.model.set('allow_filetransfer', allow);
-                        callback();
-                    };
-
-                    if (!converse.peerWrap.isConnected() || !converse.peerWrap.util.supports.data) {
-                        converse.log('peer transfer not supported', converse.peerWrap.util.browser);
-                        cb(false);
-                    }
-                    else {
-                        converse.peerWrap.isRemotePeerAvailable(jid, function (isAvailable) {
-                            converse.log(jid, 'peer available', isAvailable);
-                            self.model.set('allow_filetransfer', isAvailable);
-                            cb(isAvailable);
-                        });
-                    }
-                }
+            isFiletransferSupported: function () {
+                return converse.peerWrap.isConnected() && converse.peerWrap.util.supports.data;
             },
 
             renderAvatar: function () {
